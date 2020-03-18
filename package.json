@@ -1,0 +1,28 @@
+{
+  "name": "cobyo-video-backend",
+  "version": "0.0.1",
+  "description": "Virtual Cafeteria",
+  "main": "index.js",
+  "dependencies": {
+    "@types/express": "^4.17.2",
+    "agora-access-token": "^2.0.2",
+    "aws-sdk": "^2.630.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "querystring": "^0.2.0",
+    "request": "^2.88.2",
+    "serverless-http": "^2.3.1",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "npm run tsc",
+    "dev": "npm run build && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "deploy": "npm run build && serverless deploy"
+  },
+  "author": "alexc0794",
+  "license": "ISC"
+}
