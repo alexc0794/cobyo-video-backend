@@ -19,9 +19,10 @@ if (IS_DEV) {
   app.listen(PORT, () => {
     console.log('List of available endpoints:');
     console.log();
-    console.log(`http://localhost:${PORT}`);
+    console.log(`http://localhost:${PORT}/token/1`);
+    console.log(`http://localhost:${PORT}/table/1`);
     // Add more here
   });
 }
 
-module.exports.handler = serverless(app)
+module.exports.handler = serverless(app);
