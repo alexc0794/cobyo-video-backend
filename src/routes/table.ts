@@ -78,9 +78,9 @@ export default (app: Router) => {
     res.send(saved);
   });
 
-  app.get('/transcript/:table_id/keywords', async function(req, res) {
+  app.get('/table/:table_id/keywords', async function(req, res) {
     const table_id: string = req.params.table_id;
-    const min_frequency: number = req.body.min_frequency || 3;
+    const min_frequency: number = req.query.min_frequency || 3;
     const transcripts = await (new TranscriptRepository()).get_transcripts_by_table_id(table_id);
     const dictionary = {};
     // TODO: Optimize by using min-heap or trie
