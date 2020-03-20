@@ -27,29 +27,29 @@ export default class TableRepository extends BaseRepository {
         if (data && data.Item && data.Item) {
           return resolve(data.Item);
         }
-        console.log(`Could not find table ${table_id}`)
+        console.error(`Could not find table ${table_id}`)
         return resolve();
       })
     );
   }
 
-  async update_table(table_id: string, seats: Array<UserInSeat>, name: string): Promise<void> {
+  async update_table(table_id: string, seats: Array<UserInSeat>, name: string): Promise<Table|undefined> {
+    const item = {
+      'table_id': table_id,
+      'seats': seats,
+      'name': name,
+      'last_updated_at': (new Date()).toISOString(),
+    }
     return new Promise((resolve, reject) =>
       this.aws_client.put({
         'TableName': this.table_name,
-        'Item': {
-          'table_id': table_id,
-          'seats': seats,
-          'name': name,
-          'last_updated_at': (new Date()).toISOString(),
-        }
+        'Item': item
       }, (err, data) => {
         if (err) {
           console.error('Failed to update table', table_id, err);
           return reject();
         }
-        console.log('Successful update of table', table_id, data);
-        return resolve();
+        return resolve(item);
       })
     );
   }
