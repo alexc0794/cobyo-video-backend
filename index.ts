@@ -21,7 +21,7 @@ if (IS_DEV) {
     console.log();
     console.log(`http://localhost:${PORT}/token/1`);
     console.log(`http://localhost:${PORT}/table/1`);
-    console.log(`http://localhost:${PORT}/transcript/1/keywords`);
+    console.log(`http://localhost:${PORT}/table/1/keywords`);
     // Add more here
   });
 }

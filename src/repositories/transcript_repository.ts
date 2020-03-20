@@ -31,10 +31,13 @@ export default class TranscriptRepository extends BaseRepository {
   }
 
   async save_transcript(table_id: string, body: string): Promise<boolean> {
+    const SECONDS_IN_AN_HOUR = 60 * 60;
+    const seconds_since_epoch = Math.round(Date.now() / 1000);
     const item = {
       'table_id': table_id,
       'body': body,
       'added_at': (new Date()).toISOString(),
+      'expiring_at': seconds_since_epoch + SECONDS_IN_AN_HOUR
     };
     return new Promise((resolve, _) => {
       this.aws_client.put({
