@@ -62,20 +62,26 @@ export default (app: Router) => {
     }
     const seat = seats[seat_number];
     if (!!seat && seat.user_id !== user_id) {
-      console.error(`${seat.user_id} is already sitting there`, seat_number);
+      console.error(`Different user ${seat.user_id} is already sitting there`, seat_number);
       return res.send(false);
     }
-    // Remove user from previous seat if already at the table so user doesnt show up twice.
-    seats = seats.map(seat => {
-      if (!seat || seat.user_id == user_id) {
-        return null;
-      }
-      return seat;
-    });
-    seats[seat_number] = {
-      user_id,
-      sat_down_at: (new Date()).toISOString(),
-    };
+
+    const now = (new Date()).toISOString();
+    if (!!seat && seat.user_id === user_id) { // User is just sending heartbeat
+      seats[seat_number] = {
+        user_id: seat.user_id,
+        last_updated_at: now,
+        sat_down_at: seat.sat_down_at,
+      };
+    } else {
+      // Remove user from previous seat if already at the table so user doesnt show up twice.
+      seats = seats.map(seat => (seat && seat.user_id !== user_id) ? seat : null);
+      seats[seat_number] = {
+        user_id,
+        last_updated_at: now,
+        sat_down_at: now,
+      };
+    }
     const updated_table = await (new TableRepository()).update_table(
       table_id,
       seats,
@@ -131,5 +137,5 @@ export default (app: Router) => {
       keywords[entry[0]] = entry[1];
     });
     res.send(keywords);
-  })
+  });
 }

@@ -2,6 +2,7 @@ import BaseRepository from './base_repository'
 
 type UserInSeat = {
   user_id: string,
+  last_updated_at: string,
   sat_down_at: string,
 } | null;
 
