@@ -26,6 +26,22 @@ export default (app: Router) => {
     res.send(true);
   });
 
+  app.post('/table/:table_id/user_ids', async function (req, res) {
+    const table_id = req.params.table_id;
+    const user_ids = req.body.user_ids;
+    const table = await (new TableRepository()).get_table_by_id(table_id);
+    if (!table) {
+      return res.send(false);
+    }
+    const seats = table.seats.map(seat => seat && user_ids.includes(seat.user_id) ? seat : null);
+    const updated_table = await (new TableRepository()).update_table(
+      table_id,
+      seats,
+      table.name
+    );
+    res.send(updated_table);
+  });
+
   // Single person sits down at table
   app.post('/table/:table_id/:seat_number', async function(req, res) {
     const table_id = req.params.table_id;
@@ -81,6 +97,7 @@ export default (app: Router) => {
   app.get('/table/:table_id/keywords', async function(req, res) {
     const table_id: string = req.params.table_id;
     const min_frequency: number = req.query.min_frequency || 3;
+    const min_word_length: number = req.query.min_word_length || 5;
     const transcripts = await (new TranscriptRepository()).get_transcripts_by_table_id(table_id);
     const dictionary = {};
     // TODO: Optimize by using min-heap or trie
@@ -88,7 +105,7 @@ export default (app: Router) => {
       const words = transcript.body.split(" ");
       for (let i = 0; i < words.length; i++) {
         const word = words[i]
-        if (word.length < 3) { // Word must be 3 letters or more
+        if (word.length < min_word_length) { // Word must be min_word_length letters or more
           continue;
         }
         const letters = /^[A-Za-z-]+$/;
