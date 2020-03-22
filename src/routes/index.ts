@@ -8,16 +8,17 @@ const router = Router();
 export default (app: express.Application) => {
   app.get('/token/:uid', function(req, res) {
     const uid = req.params.uid;
+    const channel_name = req.query.channel_name || 'channelName';
     const ONE_HOUR_S = 3600;
-    const currentTimestamp = Math.floor(Date.now() / 1000);
-    const expiredTimestamp = currentTimestamp + ONE_HOUR_S;
+    const current_timestamp = Math.floor(Date.now() / 1000);
+    const expired_timestamp = current_timestamp + ONE_HOUR_S;
     const token = RtcTokenBuilder.buildTokenWithUid(
       AGORA_APP_ID,
       AGORA_APP_CERTIFICATE,
-      'channelName',
+      channel_name,
       uid,
       RtcRole.PUBLISHER,
-      expiredTimestamp,
+      expired_timestamp,
     );
     res.send(token);
   });
