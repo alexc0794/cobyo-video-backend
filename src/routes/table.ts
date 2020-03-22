@@ -10,6 +10,33 @@ export default (app: Router) => {
   app.get('/table/:table_id', async function(req, res) {
     const table_id = req.params.table_id;
     const table = await (new TableRepository()).get_table_by_id(table_id);
+    if (!table) {
+      return res.send(table);
+    }
+    const seats = table ? table.seats : [];
+
+    let has_expired_user = false;
+    const filtered_seats = seats.map(seat => {
+      if (!seat) {
+        return null;
+      }
+      const seconds_ago_last_updated_at = ((new Date()).getTime() - (new Date(seat.last_updated_at)).getTime()) / 1000;
+      if (seconds_ago_last_updated_at > 120) { // Expire after 2 minutes
+        has_expired_user = true;
+        return null;
+      }
+      return seat;
+    });
+
+    if (has_expired_user) {
+      const updated_table = await (new TableRepository()).update_table(
+        table_id,
+        filtered_seats,
+        table.name
+      );
+      return res.send(updated_table);
+    }
+
     res.send(table);
   });
 
@@ -24,6 +51,22 @@ export default (app: Router) => {
       name
     );
     res.send(true);
+  });
+
+  app.post('/table/:table_id/exit', async function (req, res) {
+    const table_id = req.params.table_id;
+    const user_id = req.body.user_id;
+    const table = await (new TableRepository()).get_table_by_id(table_id);
+    if (!table) {
+      return res.send(false);
+    }
+    const seats = table.seats.map(seat => seat && seat.user_id !== user_id ? seat : null);
+    const updated_table = await (new TableRepository()).update_table(
+      table_id,
+      seats,
+      table.name
+    );
+    res.send(updated_table);
   });
 
   app.post('/table/:table_id/user_ids', async function (req, res) {
