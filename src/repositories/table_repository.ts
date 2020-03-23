@@ -40,7 +40,7 @@ export default class TableRepository extends BaseRepository {
       'seats': seats,
       'name': name,
       'last_updated_at': (new Date()).toISOString(),
-    }
+    };
     return new Promise((resolve, reject) =>
       this.aws_client.put({
         'TableName': this.table_name,

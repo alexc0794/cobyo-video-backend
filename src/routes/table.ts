@@ -176,7 +176,7 @@ export default (app: Router) => {
     });
 
     const keywords = {};
-    filtered_words.forEach(entry => {
+    filtered_words.slice(0, 10).forEach(entry => {
       keywords[entry[0]] = entry[1];
     });
     res.send(keywords);
