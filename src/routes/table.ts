@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import TableRepository from '../repositories/table_repository';
 import TranscriptRepository from '../repositories/transcript_repository';
+import UserRepository from '../repositories/user_repository';
 
 export default (app: Router) => {
   app.use(bodyParser.json());
@@ -13,13 +14,10 @@ export default (app: Router) => {
     if (!table) {
       return res.send(table);
     }
-    const seats = table ? table.seats : [];
 
     let has_expired_user = false;
-    const filtered_seats = seats.map(seat => {
-      if (!seat) {
-        return null;
-      }
+    const seats = table.seats.map(seat => {
+      if (!seat) { return null; }
       const seconds_ago_last_updated_at = ((new Date()).getTime() - (new Date(seat.last_updated_at)).getTime()) / 1000;
       if (seconds_ago_last_updated_at > 120) { // Expire after 2 minutes
         has_expired_user = true;
@@ -28,16 +26,16 @@ export default (app: Router) => {
       return seat;
     });
 
+    const user_ids: Array<string> = [];
+    seats.forEach(seat => seat && user_ids.push(seat.user_id));
+    const users = await (new UserRepository()).get_users_by_ids(user_ids);
+
     if (has_expired_user) {
-      const updated_table = await (new TableRepository()).update_table(
-        table_id,
-        filtered_seats,
-        table.name
-      );
-      return res.send(updated_table);
+      const updated_table = await (new TableRepository()).update_table(table_id, seats, table.name);
+      return res.send({ table: updated_table, users });
     }
 
-    res.send(table);
+    res.send({ table, users });
   });
 
   // Post a full update to the state of table

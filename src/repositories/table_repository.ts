@@ -1,14 +1,14 @@
 import BaseRepository from './base_repository'
 
-type UserInSeat = {
+type SeatType = {
   user_id: string,
   last_updated_at: string,
   sat_down_at: string,
 } | null;
 
-type Table = {
+type TableType = {
   table_id: string,
-  seats: Array<UserInSeat>,
+  seats: Array<SeatType>,
   name: string,
   last_updated_at: string,
 };
@@ -17,7 +17,7 @@ export default class TableRepository extends BaseRepository {
 
   table_name = 'Tables';
 
-  async get_table_by_id(table_id: string): Promise<Table|undefined> {
+  async get_table_by_id(table_id: string): Promise<TableType|undefined> {
     return new Promise((resolve, reject) =>
       this.aws_client.get({
         'TableName': this.table_name,
@@ -34,7 +34,11 @@ export default class TableRepository extends BaseRepository {
     );
   }
 
-  async update_table(table_id: string, seats: Array<UserInSeat>, name: string): Promise<Table|undefined> {
+  async update_table(
+    table_id: string,
+    seats: Array<SeatType>,
+    name: string,
+  ): Promise<TableType|undefined> {
     const item = {
       'table_id': table_id,
       'seats': seats,

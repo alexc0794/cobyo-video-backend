@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import { RtcTokenBuilder, RtcRole } from 'agora-access-token';
 import { AGORA_APP_ID, AGORA_APP_CERTIFICATE } from '../../config';
 import table from './table';
+import user from './user';
 
 const router = Router();
 
@@ -24,6 +25,7 @@ export default (app: express.Application) => {
   });
 
   table(router);
+  user(router);
 
   app.use('/', router);
 };
