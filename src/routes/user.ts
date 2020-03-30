@@ -20,28 +20,30 @@ export default (app: Router) => {
     const facebook_user_id = req.body.facebook_user_id;
     const user_repository = new UserRepository();
     let user_id = await user_repository.get_user_id_by_facebook_user_id(facebook_user_id);
-    if (user_id) {
-      const user = await user_repository.get_user_by_id(user_id);
-      return res.send(user);
-    }
-    user_id = generate_random_uint_32().toString();
-    const first_name = req.body.first_name;
-    const last_name = req.body.last_name;
-    const email = req.body.email;
-    const profile_picture_url = req.body.profile_picture_url;
     let user;
-    try {
-      user = await user_repository.create_user(
-        user_id,
-        facebook_user_id,
-        email,
-        first_name,
-        last_name,
-        profile_picture_url,
-      );
-    } catch {
-      return res.send();
+    if (user_id) {
+      user = await user_repository.get_user_by_id(user_id);
+    } else {
+      user_id = generate_random_uint_32().toString();
+      const first_name = req.body.first_name;
+      const last_name = req.body.last_name;
+      const email = req.body.email;
+      const profile_picture_url = req.body.profile_picture_url;
+      try {
+        user = await user_repository.create_user(
+          user_id,
+          facebook_user_id,
+          email,
+          first_name,
+          last_name,
+          profile_picture_url,
+        );
+      } catch {
+        console.error(`Failed to create user ${user.user_id}`);
+        return res.send();
+      }
     }
+
     try {
       await (new ActiveUserRepository()).update_active_user(user.user_id);
     } catch {

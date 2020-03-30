@@ -94,15 +94,13 @@ dynamodb.createTable(
     TableName: 'ActiveUsers',
     KeySchema: [
       { AttributeName: 'user_id', KeyType: 'HASH' },
-      { AttributeName: 'last_active_at', KeyType: 'RANGE' }
     ],
     AttributeDefinitions: [
       { AttributeName: 'user_id', AttributeType: 'S' },
-      { AttributeName: 'last_active_at', AttributeType: 'S' },
     ],
     ProvisionedThroughput: {
-      ReadCapacityUnits: 10,
-      WriteCapacityUnits: 10
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
     }
   },
   (err, data) => {
