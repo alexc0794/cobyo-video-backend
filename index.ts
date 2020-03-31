@@ -9,7 +9,7 @@ const app = express();
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
 });
 
@@ -22,6 +22,7 @@ if (IS_DEV) {
     console.log(`http://localhost:${PORT}/token/1`);
     console.log(`http://localhost:${PORT}/table/1`);
     console.log(`http://localhost:${PORT}/table/1/keywords`);
+    console.log(`http://localhost:${PORT}/active-users`); // Not authorized
     // Add more here
   });
 }

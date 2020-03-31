@@ -1,5 +1,8 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+import { authenticate } from './middleware';
+import { ACCESS_TOKEN_SECRET } from '../../config';
 import UserRepository from '../repositories/user_repository';
 import ActiveUserRepository from '../repositories/active_user_repository';
 
@@ -11,10 +14,6 @@ export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/user/:user_id', async function(req, res) {
-
-  });
-
   // Post a full update to the state of table
   app.post('/user/create', async function(req, res) {
     const facebook_user_id = req.body.facebook_user_id;
@@ -25,10 +24,7 @@ export default (app: Router) => {
       user = await user_repository.get_user_by_id(user_id);
     } else {
       user_id = generate_random_uint_32().toString();
-      const first_name = req.body.first_name;
-      const last_name = req.body.last_name;
-      const email = req.body.email;
-      const profile_picture_url = req.body.profile_picture_url;
+      const { first_name, last_name, email, profile_picture_url } = req.body;
       try {
         user = await user_repository.create_user(
           user_id,
@@ -39,8 +35,7 @@ export default (app: Router) => {
           profile_picture_url,
         );
       } catch {
-        console.error(`Failed to create user ${user.user_id}`);
-        return res.send();
+        return res.status(500).send({ error: `Failed to create user ${user.user_id}`});
       }
     }
 
@@ -49,11 +44,19 @@ export default (app: Router) => {
     } catch {
       console.error(`Failed to make user active but was successful in creating user ${user.user_id}`);
     }
-    return res.send(user);
+
+    const token = jwt.sign(
+      { user_id: user.user_id, facebook_user_id },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: '3h'}
+    );
+    return res.send({ user, token });
   });
 
-  app.get('/active-users', async function(req, res) {
-    const active_users = await (new ActiveUserRepository()).get_active_users();
+  app.get('/active-users', authenticate, async function(req: any, res) {
+    const user_id = req.user.user_id;
+    // Filter out self
+    const active_users = (await (new ActiveUserRepository()).get_active_users()).filter(user => user.user_id !== user_id);
     const user_ids = active_users.map(user => user.user_id);
     const users = await (new UserRepository()).get_users_by_ids(user_ids);
 

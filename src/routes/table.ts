@@ -1,41 +1,78 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
-import TableRepository from '../repositories/table_repository';
+import { soft_authenticate } from './middleware';
+import TableRepository, { SeatType, TableType } from '../repositories/table_repository';
 import TranscriptRepository from '../repositories/transcript_repository';
 import UserRepository from '../repositories/user_repository';
+import ActiveUserRepository from '../repositories/active_user_repository';
+
+const SEAT_INACTIVITY_EXPIRATION_IN_SECONDS = 10;
 
 export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/table/:table_id', async function(req, res) {
-    const table_id = req.params.table_id;
-    const table = await (new TableRepository()).get_table_by_id(table_id);
-    if (!table) {
-      return res.send(table);
-    }
+  type FilterExpiredSeatsType = {
+    has_expired_user: boolean,
+    seats: Array<SeatType>
+  }
 
+  function filter_expired_seats(unfiltered_seats: Array<SeatType>): FilterExpiredSeatsType {
     let has_expired_user = false;
-    const seats = table.seats.map(seat => {
+    const seats = unfiltered_seats.map(seat => {
       if (!seat) { return null; }
       const seconds_ago_last_updated_at = ((new Date()).getTime() - (new Date(seat.last_updated_at)).getTime()) / 1000;
-      if (seconds_ago_last_updated_at > 120) { // Expire after 2 minutes
+      if (seconds_ago_last_updated_at > SEAT_INACTIVITY_EXPIRATION_IN_SECONDS) { // Expire after 2 minutes
         has_expired_user = true;
         return null;
       }
       return seat;
     });
 
+    return { has_expired_user, seats };
+  }
+
+  app.get('/table/:table_id', soft_authenticate, async function(req, res) {
+    const table_id = req.params.table_id;
+    let table = await (new TableRepository()).get_table_by_id(table_id);
+    if (!table) {
+      return res.status(500).send({ error: `Failed to find table ${table_id}` });
+    }
+
+    const { has_expired_user, seats } = filter_expired_seats(table.seats);
     const user_ids: Array<string> = [];
     seats.forEach(seat => seat && user_ids.push(seat.user_id));
     const users = await (new UserRepository()).get_users_by_ids(user_ids);
 
     if (has_expired_user) {
-      const updated_table = await (new TableRepository()).update_table(table_id, seats, table.name);
-      return res.send({ table: updated_table, users });
+      table = await (new TableRepository()).update_table(table_id, seats, table.name);
     }
 
     res.send({ table, users });
+  });
+
+  app.get('/tables', soft_authenticate, async function(req: any, res) {
+    const user_id = req.user ? req.user.user_id : null;
+    const table_ids: Array<string> = req.query.table_ids ? req.query.table_ids.split(',') : [];
+    const unfiltered_tables = await (new TableRepository()).get_tables_by_ids(table_ids);
+    const tables: Array<TableType> = [];
+    const user_ids: Array<string> = [];
+    for (let i = 0; i < unfiltered_tables.length; i++) {
+      let table = unfiltered_tables[i];
+      const { has_expired_user, seats } = filter_expired_seats(table.seats);
+      seats.forEach(seat => seat && user_ids.push(seat.user_id));
+      if (has_expired_user) {
+        try {
+          table = await (new TableRepository()).update_table(table.table_id, seats, table.name);
+        } catch {
+          console.warn('Could not update table with expired seats');
+        }
+      }
+      tables.push(table);
+    }
+    const users = await (new UserRepository()).get_users_by_ids(user_ids);
+
+    res.send({ tables, users });
   });
 
   // Post a full update to the state of table
