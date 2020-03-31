@@ -72,6 +72,15 @@ export default (app: Router) => {
     }
     const users = await (new UserRepository()).get_users_by_ids(user_ids);
 
+    if (user_id) {
+      // If user_id is passed in, update user's activity
+      try {
+        await (new ActiveUserRepository()).update_active_user(user_id);
+      } catch {
+        console.error(`Failed to update user ${user_id}'s activity`);
+      }
+    }
+
     res.send({ tables, users });
   });
 

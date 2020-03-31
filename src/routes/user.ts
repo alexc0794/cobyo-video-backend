@@ -54,9 +54,7 @@ export default (app: Router) => {
   });
 
   app.get('/active-users', authenticate, async function(req: any, res) {
-    const user_id = req.user.user_id;
-    // Filter out self
-    const active_users = (await (new ActiveUserRepository()).get_active_users()).filter(user => user.user_id !== user_id);
+    const active_users = (await (new ActiveUserRepository()).get_active_users());
     const user_ids = active_users.map(user => user.user_id);
     const users = await (new UserRepository()).get_users_by_ids(user_ids);
 
