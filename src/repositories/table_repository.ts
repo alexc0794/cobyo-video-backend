@@ -1,23 +1,12 @@
-import BaseRepository from './base_repository'
-
-export type SeatType = {
-  user_id: string,
-  last_updated_at: string,
-  sat_down_at: string,
-} | null;
-
-export type TableType = {
-  table_id: string,
-  seats: Array<SeatType>,
-  name: string,
-  last_updated_at: string,
-};
+import BaseRepository from './base_repository';
+import { Connection, Shape } from '../enums/table';
+import Table, { Seat } from '../interfaces/table';
 
 export default class TableRepository extends BaseRepository {
 
   table_name = 'Tables';
 
-  async get_table_by_id(table_id: string): Promise<TableType|undefined> {
+  async get_table_by_id(table_id: string): Promise<Table|undefined> {
     return new Promise((resolve, reject) =>
       this.aws_client.get({
         'TableName': this.table_name,
@@ -34,7 +23,7 @@ export default class TableRepository extends BaseRepository {
     );
   }
 
-  async get_tables_by_ids(table_ids: Array<string>): Promise<Array<TableType>> {
+  async get_tables_by_ids(table_ids: Array<string>): Promise<Array<Table>> {
     return new Promise((resolve, reject) =>
       this.aws_client.batchGet({
         'RequestItems': {
@@ -56,14 +45,18 @@ export default class TableRepository extends BaseRepository {
 
   async update_table(
     table_id: string,
-    seats: Array<SeatType>,
+    seats: Array<Seat|null>,
     name: string,
-  ): Promise<TableType> {
+    connection: Connection,
+    shape: Shape,
+  ): Promise<Table> {
     const item = {
       'table_id': table_id,
       'seats': seats,
       'name': name,
       'last_updated_at': (new Date()).toISOString(),
+      'connection': connection,
+      'shape': shape,
     };
     return new Promise((resolve, reject) =>
       this.aws_client.put({

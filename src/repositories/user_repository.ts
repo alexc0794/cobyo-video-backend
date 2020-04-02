@@ -1,13 +1,5 @@
 import BaseRepository from './base_repository';
-
-type User = {
-  user_id: string,
-  facebook_user_id: string|null,
-  email: string,
-  first_name: string,
-  last_name: string,
-  profile_picture_url: string|null,
-};
+import User from '../interfaces/user';
 
 export default class UserRepository extends BaseRepository {
 

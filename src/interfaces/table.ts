@@ -1,16 +1,16 @@
 import { Shape, Connection } from '../enums/table';
 
 export interface Seat {
-  userId: string,
-  lastUpdatedAt: string,
-  satDownAt: string,
+  user_id: string,
+  last_updated_at: string,
+  sat_down_at: string,
 };
 
 export default interface Table {
-  tableId: string,
+  table_id: string,
   seats: Array<Seat|null>,
   name: string,
-  lastUpdatedAt: string,
+  last_updated_at: string,
   shape: Shape,
   connection: Connection
 };

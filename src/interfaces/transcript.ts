@@ -1,5 +1,5 @@
 export default interface Transcript {
   body: string,
-  tableId: string,
-  addedAt: string,
+  table_id: string,
+  added_at: string,
 };

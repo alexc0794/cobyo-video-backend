@@ -1,8 +1,8 @@
 export default interface User {
-  userId: string,
-  facebookUserId: string|null,
+  user_id: string,
+  facebook_user_id: string|null,
   email: string,
-  firstName: string,
-  lastName: string,
-  profilePictureUrl: string|null,
+  first_name: string,
+  last_name: string,
+  profile_picture_url: string|null,
 };

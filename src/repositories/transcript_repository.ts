@@ -1,10 +1,5 @@
-import BaseRepository from './base_repository'
-
-type Transcript = {
-  body: string,
-  table_id: string,
-  added_at: string,
-};
+import BaseRepository from './base_repository';
+import Transcript from '../interfaces/transcript';
 
 export default class TranscriptRepository extends BaseRepository {
 

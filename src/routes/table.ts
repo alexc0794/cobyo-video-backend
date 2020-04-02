@@ -2,7 +2,9 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import { soft_authenticate } from './middleware';
 import { IS_DEV } from '../../config';
-import TableRepository, { SeatType, TableType } from '../repositories/table_repository';
+import { Connection, Shape, DEFAULT_CONNECTION, DEFAULT_SHAPE} from '../enums/table';
+import Table, { Seat } from '../interfaces/table';
+import TableRepository from '../repositories/table_repository';
 import UserRepository from '../repositories/user_repository';
 import ActiveUserRepository from '../repositories/active_user_repository';
 
@@ -14,10 +16,10 @@ export default (app: Router) => {
 
   type FilterExpiredSeatsType = {
     has_expired_user: boolean,
-    seats: Array<SeatType>
+    seats: Array<Seat|null>
   }
 
-  function filter_expired_seats(unfiltered_seats: Array<SeatType>): FilterExpiredSeatsType {
+  function filter_expired_seats(unfiltered_seats: Array<Seat|null>): FilterExpiredSeatsType {
     let has_expired_user = false;
     const seats = unfiltered_seats.map(seat => {
       if (!seat) { return null; }
@@ -45,7 +47,7 @@ export default (app: Router) => {
     const users = await (new UserRepository()).get_users_by_ids(user_ids);
 
     if (has_expired_user) {
-      table = await (new TableRepository()).update_table(table_id, seats, table.name);
+      table = await (new TableRepository()).update_table(table_id, seats, table.name, table.connection, table.shape);
     }
 
     res.send({ table, users });
@@ -55,7 +57,7 @@ export default (app: Router) => {
     const user_id = req.user ? req.user.user_id : null;
     const table_ids: Array<string> = req.query.table_ids ? req.query.table_ids.split(',') : [];
     const unfiltered_tables = await (new TableRepository()).get_tables_by_ids(table_ids);
-    const tables: Array<TableType> = [];
+    const tables: Array<Table> = [];
     const user_ids: Array<string> = [];
     for (let i = 0; i < unfiltered_tables.length; i++) {
       let table = unfiltered_tables[i];
@@ -63,7 +65,7 @@ export default (app: Router) => {
       seats.forEach(seat => seat && user_ids.push(seat.user_id));
       if (has_expired_user) {
         try {
-          table = await (new TableRepository()).update_table(table.table_id, seats, table.name);
+          table = await (new TableRepository()).update_table(table.table_id, seats, table.name, table.connection, table.shape);
         } catch {
           console.warn('Could not update table with expired seats');
         }
@@ -89,10 +91,14 @@ export default (app: Router) => {
     const table_id = req.params.table_id;
     const seats = req.body.seats;
     const name = req.body.name;
+    const connection = req.body.connection;
+    const shape = req.body.shape;
     await (new TableRepository()).update_table(
       table_id,
       seats,
-      name
+      name,
+      connection || DEFAULT_CONNECTION,
+      shape || DEFAULT_SHAPE,
     );
     res.send(true);
   });
@@ -108,7 +114,9 @@ export default (app: Router) => {
     const updated_table = await (new TableRepository()).update_table(
       table_id,
       seats,
-      table.name
+      table.name,
+      table.connection,
+      table.shape,
     );
     res.send(updated_table);
   });
@@ -124,7 +132,7 @@ export default (app: Router) => {
     const updated_table = await (new TableRepository()).update_table(
       table_id,
       seats,
-      table.name
+      table.name, table.connection, table.shape
     );
     res.send(updated_table);
   });
@@ -172,7 +180,7 @@ export default (app: Router) => {
     const updated_table = await (new TableRepository()).update_table(
       table_id,
       seats,
-      table.name
+      table.name, table.connection, table.shape
     );
     res.send(updated_table);
   });

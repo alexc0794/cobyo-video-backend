@@ -1,6 +1,8 @@
 export enum Shape {
   Rectangular = 'RECTANGULAR', // No one at ends. If we want ppl at ends, add a new enum
   Round = 'ROUND',
+  Uup = 'UUP',
+  Udown = 'UDOWN',
 };
 
 export const DEFAULT_SHAPE = Shape.Rectangular;
@@ -13,4 +15,4 @@ export enum Connection {
   AudioOnlyBroadcast = 'AUDIO_ONLY_BROADCAST', // use case: subscribe to a DJ?
 };
 
-export const DEFAULT_CONNECTION_TYPE = Connection.VideoAudio;
+export const DEFAULT_CONNECTION = Connection.VideoAudio;
