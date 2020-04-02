@@ -24,6 +24,10 @@ export default class TableRepository extends BaseRepository {
   }
 
   async get_tables_by_ids(table_ids: Array<string>): Promise<Array<Table>> {
+    if (table_ids.length === 0) {
+      return Promise.resolve([]);
+    }
+    
     return new Promise((resolve, reject) =>
       this.aws_client.batchGet({
         'RequestItems': {

@@ -22,7 +22,7 @@ if (IS_DEV) {
     console.log(`http://localhost:${PORT}/token/1`);
     console.log(`http://localhost:${PORT}/table/1`);
     console.log(`http://localhost:${PORT}/table/1/keywords`);
-    console.log(`http://localhost:${PORT}/active-users`); // Not authorized
+    console.log(`http://localhost:${PORT}/storefront`);
     // Add more here
   });
 }

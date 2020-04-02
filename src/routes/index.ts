@@ -4,6 +4,7 @@ import { AGORA_APP_ID, AGORA_APP_CERTIFICATE } from '../../config';
 import table from './table';
 import transcript from './transcript';
 import user from './user';
+import storefront from './storefront';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ export default (app: express.Application) => {
   table(router);
   transcript(router);
   user(router);
+  storefront(router);
 
   app.use('/', router);
 };
