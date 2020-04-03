@@ -16,6 +16,8 @@ type StorefrontStatus = {
 export default class StorefrontRepository extends BaseRepository {
 
   get_storefront_by_moment(moment): StorefrontStatus {
+    return { storefront: Storefront.Club, status: Status.Open };
+    
     const hour = parseInt(moment.format('H'), 10);
     const minute = parseInt(moment.format('m'), 10);
 
@@ -38,7 +40,7 @@ export default class StorefrontRepository extends BaseRepository {
       return { storefront: Storefront.Club, status: Status.Open };
     }
 
-    console.error('Something wrong with my storefront hours logic');
+    console.error('Something wrong with storefront hours logic');
     return { storefront: DEFAULT_STOREFRONT, status: Status.Open };
   }
 
