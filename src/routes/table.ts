@@ -193,7 +193,7 @@ export default (app: Router) => {
     }
     const updated_table = await (new TableRepository()).update_table(
       table_id,
-      seats,
+      filter_expired_seats(seats).seats,
       table.name, table.connection, table.shape
     );
     res.send(updated_table);
