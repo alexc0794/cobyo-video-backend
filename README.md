@@ -11,6 +11,8 @@ npm run dev
 See `package.json` for other scripts to run.
 
 ### DynamoDB
+Install [AWS CLI](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.CLI.html) for DynamoDB.
+
 Create DynamoDB tables locally by adding the command in `scripts/create_tables.ts`.
 ```
 // Build local changes and run the script
