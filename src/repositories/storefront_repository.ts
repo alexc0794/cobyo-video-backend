@@ -17,7 +17,7 @@ export default class StorefrontRepository extends BaseRepository {
 
   get_storefront_by_moment(moment): StorefrontStatus {
     return { storefront: Storefront.Club, status: Status.Open };
-    
+
     const hour = parseInt(moment.format('H'), 10);
     const minute = parseInt(moment.format('m'), 10);
 
@@ -44,12 +44,19 @@ export default class StorefrontRepository extends BaseRepository {
     return { storefront: DEFAULT_STOREFRONT, status: Status.Open };
   }
 
-  get_storefront_table_ids(storefront: Storefront): Array<string> {
+  get_storefront_table_id_grid(storefront: Storefront): Array<Array<string|null>> {
     switch (storefront) {
       case Storefront.Club:
-        return ["club1", "club2", "club3", "club4", "club5", "club6", "club7"];
+        return [
+          ['club1a', 'club1b'],
+          ['club2a', 'club2b', 'club2c'],
+          ['club3a', 'club3b']
+        ];
       default:
-        return ["1", "2", "3", "4", "5", "6"];
+        return [
+          ['1a', '1b', '1c'],
+          ['2a', '2b', '2c'],
+        ];
     }
   }
 

@@ -27,7 +27,7 @@ export default class TableRepository extends BaseRepository {
     if (table_ids.length === 0) {
       return Promise.resolve([]);
     }
-    
+
     return new Promise((resolve, reject) =>
       this.aws_client.batchGet({
         'RequestItems': {

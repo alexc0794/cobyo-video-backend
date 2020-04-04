@@ -1,8 +1,9 @@
 export enum Shape {
   Rectangular = 'RECTANGULAR', // No one at ends. If we want ppl at ends, add a new enum
   Round = 'ROUND',
-  Uup = 'UUP',
-  Udown = 'UDOWN',
+  UUp = 'U_UP',
+  UDown = 'U_DOWN',
+  DanceFloor = 'DANCE_FLOOR', // Fuck. Already evolving from tables being the only kind of video streams. Refactor later
 };
 
 export const DEFAULT_SHAPE = Shape.Rectangular;

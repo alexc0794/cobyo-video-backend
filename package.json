@@ -22,7 +22,7 @@
     "start": "node build/index.js",
     "build": "npm run tsc",
     "dev": "export NODE_ENV=development && npm run build && npm run start",
-    "ddb": "npm run build && node build/scripts/create_tables.js",
+    "ddb": "export NODE_ENV=development && npm run build && node build/scripts/create_tables.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "deploy": "npm run build && serverless deploy"

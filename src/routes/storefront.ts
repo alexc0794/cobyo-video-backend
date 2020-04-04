@@ -16,12 +16,12 @@ export default (app: Router) => {
   app.get('/storefront', feature_overrides, function(req, res) {
     const storefront_repository = new StorefrontRepository();
     const { storefront, status } = storefront_repository.get_storefront_by_moment(get_nyc_moment());
-    const table_ids = storefront_repository.get_storefront_table_ids(storefront);
+    const table_id_grid = storefront_repository.get_storefront_table_id_grid(storefront);
 
     res.send({
       storefront,
       status,
-      table_ids,
+      table_id_grid,
     });
   });
 }

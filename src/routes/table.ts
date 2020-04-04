@@ -93,14 +93,18 @@ export default (app: Router) => {
     const name = req.body.name;
     const connection = req.body.connection;
     const shape = req.body.shape;
-    await (new TableRepository()).update_table(
-      table_id,
-      seats,
-      name,
-      connection || DEFAULT_CONNECTION,
-      shape || DEFAULT_SHAPE,
-    );
-    res.send(true);
+    try {
+      await (new TableRepository()).update_table(
+        table_id,
+        seats,
+        name,
+        connection || DEFAULT_CONNECTION,
+        shape || DEFAULT_SHAPE,
+      );
+      return res.send(true);
+    } catch {
+      return res.send(false);
+    }
   });
 
   app.post('/table/:table_id/leave', async function (req, res) {
