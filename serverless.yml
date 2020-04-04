@@ -1,0 +1,49 @@
+service: cobyo-video-backend
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:BatchGetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Tables"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Transcripts"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:BatchGetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Users"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Users/index/FacebookUserIndex"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ActiveUsers"
+functions:
+  app:
+    handler: build/index.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
