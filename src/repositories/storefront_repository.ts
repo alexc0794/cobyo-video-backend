@@ -54,7 +54,7 @@ export default class StorefrontRepository extends BaseRepository {
         ];
       default:
         return [
-          ['1a', '1b', '1c'],
+          ['1a', '1b'],
           ['2a', '2b', '2c'],
         ];
     }
