@@ -142,23 +142,33 @@ export default (app: Router) => {
   });
 
   // Single person sits down at table
-  app.post('/table/:table_id/:seat_number', async function(req, res) {
+  app.post('/table/:table_id/join', async function(req, res) {
     const table_id = req.params.table_id;
-    const seat_number = parseInt(req.params.seat_number, 10);
     const user_id = req.body.user_id;
     const table = await (new TableRepository()).get_table_by_id(table_id);
     if (!table) {
       return res.send(false);
     }
+
     let seats = table.seats;
     if (!seats) {
       console.error('No seats?');
       return res.send(false);
     }
-    if (!seats || seat_number > seats.length - 1) {
+
+    let seat_number = parseInt(req.body.seat_number, 10);
+    if (isNaN(seat_number)) {
+      const open_seat_numbers = seats.map((seat, i) => seat ? -1 : i).filter(i => i != -1);
+      seat_number = open_seat_numbers[
+        Math.floor(Math.random() * Math.floor(open_seat_numbers.length))
+      ];
+    }
+
+    if (seat_number > seats.length - 1) {
       console.error('Invalid seat number', seat_number);
       return res.send(false);
     }
+
     const seat = seats[seat_number];
     if (!!seat && seat.user_id !== user_id) {
       console.error(`Different user ${seat.user_id} is already sitting there`, seat_number);
