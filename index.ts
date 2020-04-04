@@ -19,10 +19,10 @@ if (IS_DEV) {
   app.listen(PORT, () => {
     console.log('List of available endpoints:');
     console.log();
+    console.log(`http://localhost:${PORT}/storefront`);
     console.log(`http://localhost:${PORT}/token/1`);
     console.log(`http://localhost:${PORT}/table/1`);
     console.log(`http://localhost:${PORT}/table/1/keywords`);
-    console.log(`http://localhost:${PORT}/storefront`);
     // Add more here
   });
 }

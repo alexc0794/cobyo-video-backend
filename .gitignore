@@ -6,6 +6,3 @@ jspm_packages
 # Serverless directories
 .serverless
 serverless.yml
-
-# Confidential
-.env

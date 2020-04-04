@@ -5,9 +5,6 @@ export const IS_DEV = process.env.NODE_ENV == 'development';
 export const PORT = 8080;
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
-// Cobyo API configuration
-// export const COBYO_API_URL = 'https://f3mf794ytg.execute-api.us-east-1.amazonaws.com/dev';
-
 // OpenTok API configurations
 export const AGORA_APP_ID = process.env.AGORA_APP_ID;
 export const AGORA_APP_CERTIFICATE = process.env.AGORA_APP_CERTIFICATE;
