@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 import { AWS_CONFIG } from '../../config';
+import { ChatMessage } from '../interfaces/chat';
 
 AWS.config.update(AWS_CONFIG);
 
@@ -15,11 +16,14 @@ export default class ApiGatewayService {
     });
   }
 
-  async send(connection_id: string, message: string) {
-    const response = await this.aws_client.postToConnection({
-      'ConnectionId': connection_id,
-      'Data': message,
-    }).promise();
-    console.log('Sent?', response);
+  async send(connection_id: string, chat_message: ChatMessage) {
+    try {
+      await this.aws_client.postToConnection({
+        'ConnectionId': connection_id,
+        'Data': JSON.stringify(chat_message),
+      }).promise();
+    } catch (e) {
+      console.warn('Failed to send message', connection_id, JSON.stringify(chat_message), e);
+    }
   }
 }

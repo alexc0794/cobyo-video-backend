@@ -134,3 +134,28 @@ dynamodb.createTable(
     }
   }
 );
+
+dynamodb.createTable(
+  {
+    TableName: 'ChatMessages',
+    KeySchema: [
+      { AttributeName: 'message_id', KeyType: 'HASH' },
+      { AttributeName: 'sent_at', KeyType: 'RANGE' }
+    ],
+    AttributeDefinitions: [
+      { AttributeName: 'message_id', AttributeType: 'S' },
+      { AttributeName: 'sent_at', AttributeType: 'S' }
+    ],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    }
+  },
+  (err, data) => {
+    if (err) {
+      console.error('Unable to create ChatMessages', JSON.stringify(err, null, 2));
+    } else {
+      console.log("Created ChatMessages", JSON.stringify(data, null, 2));
+    }
+  }
+);
