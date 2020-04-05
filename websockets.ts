@@ -6,6 +6,7 @@ import { IS_DEV, WS_PORT } from './config';
 
 if (IS_DEV) {
   const connections = {};
+
   const send = (connectionId, data) => {
     const connection = connections[connectionId];
     connection.send(JSON.stringify(data));
@@ -34,8 +35,12 @@ if (IS_DEV) {
     disconnect: chat_disconnect,
     chat_message: async (connection_id, payload) => {
       const { message, user_id } = payload;
-      if (await save_chat_message(message, user_id)) {
-        send(connection_id, payload);
+      const chat_message = await save_chat_message(message, user_id);
+      if (chat_message) {
+        Object.keys(connections).map(id => {
+          send(id, chat_message);
+        })
+
       }
     },
   };
