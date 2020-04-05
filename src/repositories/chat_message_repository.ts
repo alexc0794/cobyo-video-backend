@@ -26,7 +26,6 @@ export default class ChatMessageRepository extends BaseRepository {
   }
 
   get_message(message_id: string): Promise<ChatMessage> {
-    console.log(message_id);
     return new Promise((resolve, reject) =>
       this.aws_client.query({
         'TableName': this.table_name,
@@ -43,7 +42,7 @@ export default class ChatMessageRepository extends BaseRepository {
           console.error('No message found', message_id);
           return reject();
         }
-        
+
         return resolve(data.Items[0]);
       })
     );
@@ -65,7 +64,7 @@ export default class ChatMessageRepository extends BaseRepository {
       this.aws_client.scan(params, (err, data) => {
         if (err) {
           console.error('Failed to get messages', limit, before_sent_at);
-          return reject();
+          return resolve([]);
         }
         return resolve(data.Items);
       })

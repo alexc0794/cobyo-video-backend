@@ -18,7 +18,7 @@ export default (app: Router) => {
       try {
         before_chat_message = await chat_message_repository.get_message(before_message_id);
       } catch {
-        console.warn('Couldnt get before chat message', before_chat_message);
+        before_chat_message = null;
       }
     }
     const before_sent_at: string|null = before_chat_message ? before_chat_message.sent_at : null;

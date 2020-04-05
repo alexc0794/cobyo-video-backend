@@ -22,6 +22,21 @@ function extract_chat_message_input(body): ChatMessageInput {
   };
 }
 
+export async function save_chat_message(message: string, user_id: string): Promise<ChatMessage|null> {
+  const chat_message: ChatMessage = {
+    message_id: uuid4(),
+    user_id,
+    sent_at: (new Date()).toISOString(),
+    message,
+  };
+  const chat_message_repository = new ChatMessageRepository();
+  const success = await chat_message_repository.create_message(chat_message);
+  if (!success) {
+    return null;
+  }
+  return chat_message;
+}
+
 export default async function chat_message_handler(event, context, callback) {
   let message, user_id;
   try {
@@ -35,16 +50,8 @@ export default async function chat_message_handler(event, context, callback) {
     });
   }
 
-  const chat_message: ChatMessage = {
-    message_id: uuid4(),
-    user_id,
-    sent_at: (new Date()).toISOString(),
-    message,
-  };
-  // Save chat to data store
-  const chat_message_repository = new ChatMessageRepository();
-  const success = await chat_message_repository.create_message(chat_message);
-  if (!success) {
+  const chat_message: ChatMessage|null = await save_chat_message(message, user_id);
+  if (!chat_message) {
     return callback(null, {
       statusCode: 500
     });

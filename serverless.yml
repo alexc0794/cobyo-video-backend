@@ -66,13 +66,13 @@ functions:
       - http: ANY /
       - http: 'ANY {proxy+}'
   connectionHandler:
-    handler: build/index.connectionHandler
+    handler: build/websockets.connectionHandler
     events:
       - websocket:
           route: $connect
       - websocket:
           route: $disconnect
   defaultHandler:
-    handler: build/index.defaultHandler
+    handler: build/websockets.defaultHandler
     events:
       - websocket: $default

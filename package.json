@@ -15,14 +15,17 @@
     "querystring": "^0.2.0",
     "request": "^2.88.2",
     "serverless-http": "^2.3.1",
+    "short-uuid": "^3.1.1",
     "typescript": "^3.8.3",
-    "uuid4": "^1.1.4"
+    "uuid4": "^1.1.4",
+    "ws": "^7.2.3"
   },
   "devDependencies": {},
   "scripts": {
     "start": "node build/index.js",
     "build": "npm run tsc",
     "dev": "export NODE_ENV=development && npm run build && npm run start",
+    "ws": "export NODE_ENV=development && npm run build && node build/websockets.js",
     "ddb": "export NODE_ENV=development && npm run build && node build/scripts/create_tables.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
