@@ -2,7 +2,7 @@ import ChatConnectionRepository from '../repositories/chat_connection_repository
 
 export default async function connection_handler(event, context, callback) {
   console.log(event, context, callback);
-  const connection_id = event.requestContext.connectionId;
+  const connection_id = event.requestContext.connectionId || 'wtf';
   const chat_repository = new ChatConnectionRepository();
 
   if (event.requestContext.eventType === "CONNECT") {

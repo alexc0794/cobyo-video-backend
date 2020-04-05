@@ -33,6 +33,7 @@ module.exports.expressHandler = serverless(app);
 module.exports.connectionHandler = connection_handler;
 
 module.exports.defaultHandler = (event, context, callback) => {
+  console.log('default handler', event, context);
   callback(null, {
     statusCode: 200,
     body: "default handler was called."

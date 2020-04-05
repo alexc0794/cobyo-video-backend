@@ -14,6 +14,7 @@ export default class ChatConnectionRepository extends BaseRepository {
       'connection_id': connection_id,
       'connected_at': (new Date()).toISOString(),
     };
+
     return new Promise((resolve, reject) =>
       this.aws_client.put({
         'TableName': this.table_name,
