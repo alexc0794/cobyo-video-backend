@@ -45,10 +45,10 @@ provider:
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ActiveUsers"
   - Effect: "Allow"
     Action:
-      - dynamodb.Scan
+      - dynamodb:Scan
       - dynamodb:GetItem
-      - dynamodb.PutItem
-      - dynamodb.DeleteItem
+      - dynamodb:PutItem
+      - dynamodb:DeleteItem
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChatConnections"
 
 functions:
