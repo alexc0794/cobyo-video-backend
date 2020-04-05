@@ -7,7 +7,7 @@ The project is written in TypeScript, so the .ts files need to be built into .js
 // [Tab 1] Build local changes and run the Express API locally on port 8080
 npm run dev
 
-// [Tab 2] Build local changes and run Websockets locally on port 8888
+// [Tab 2] Build local changes and run WebSockets locally on port 8888
 npm run ws
 
 // [Tab 3] Run local DynamoDB on port 8000 (see DynamoDB section for more info)
@@ -23,6 +23,19 @@ Create DynamoDB tables locally by adding the command in `scripts/create_tables.t
 ```
 // Build local changes and run the script
 npm run ddb
+```
+
+### WebSockets
+The project uses WebSockets to implement features like chat. There are two ways to test this in development.
+The first is to manually test it with several tabs open acting as different users chatting back and forth.
+The second involves using the terminal to simulate a connection.
+
+```
+// Install from npm if you dont have wscat already. This command will connect you to the chat.
+wscat -c ws://localhost:8888 // if successful, you should see "Connected (press CTRL+C to quit)"
+
+// Now send a message
+{"action": "chat_message", "message": "hi", "user_id": "1"} // if successful, you should see the message sent back to you
 ```
 
 ## Deploying
