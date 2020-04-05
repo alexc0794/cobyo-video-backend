@@ -111,3 +111,26 @@ dynamodb.createTable(
     }
   }
 );
+
+dynamodb.createTable(
+  {
+    TableName: 'ChatConnections',
+    KeySchema: [
+      { AttributeName: 'connection_id', KeyType: 'HASH' },
+    ],
+    AttributeDefinitions: [
+      { AttributeName: 'connection_id', AttributeType: 'S' },
+    ],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    }
+  },
+  (err, data) => {
+    if (err) {
+      console.error('Unable to create ChatConnections', JSON.stringify(err, null, 2));
+    } else {
+      console.log("Created ChatConnections", JSON.stringify(data, null, 2));
+    }
+  }
+);

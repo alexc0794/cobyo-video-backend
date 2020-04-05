@@ -3,6 +3,7 @@
 **/
 import serverless from 'serverless-http';
 import express from 'express';
+import connection_handler from './websockets/handlers/connection_handler';
 import {IS_DEV, PORT} from './config';
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-require('./src/routes').default(app);
+require('./express/routes').default(app);
 
 if (IS_DEV) {
   app.listen(PORT, () => {
@@ -27,4 +28,13 @@ if (IS_DEV) {
   });
 }
 
-module.exports.handler = serverless(app);
+module.exports.expressHandler = serverless(app);
+
+module.exports.connectionHandler = connection_handler;
+
+module.exports.defaultHandler = (event, context, callback) => {
+  callback(null, {
+    statusCode: 200,
+    body: "default handler was called."
+  });
+};

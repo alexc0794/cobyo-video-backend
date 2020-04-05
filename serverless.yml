@@ -5,6 +5,8 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: us-east-1
+  websocketsApiName: cobyo-video-sockets
+  websocketsApiRouteSelectionExpression: $request.body.action
   iamRoleStatements:
   - Effect: "Allow"
     Action:
@@ -41,9 +43,28 @@ provider:
       - dynamodb:PutItem
       - dynamodb:UpdateItem
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ActiveUsers"
+  - Effect: "Allow"
+    Action:
+      - dynamodb.Scan
+      - dynamodb:GetItem
+      - dynamodb.PutItem
+      - dynamodb.DeleteItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChatConnections"
+
 functions:
   app:
-    handler: build/index.handler
+    handler: build/index.expressHandler
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+  connectionHandler:
+    handler: build/index.connectionHandler
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+  defaultHandler:
+    handler: build/index.defaultHandler
+    events:
+      - websocket: $default
