@@ -3,7 +3,8 @@
 **/
 import serverless from 'serverless-http';
 import express from 'express';
-import connection_handler from './websockets/handlers/connection_handler';
+import chat_connection_handler from './websockets/handlers/chat_connection_handler';
+import chat_message_handler from './websockets/handlers/chat_message_handler';
 import {IS_DEV, PORT} from './config';
 
 const app = express();
@@ -30,12 +31,6 @@ if (IS_DEV) {
 
 module.exports.expressHandler = serverless(app);
 
-module.exports.connectionHandler = connection_handler;
+module.exports.connectionHandler = chat_connection_handler;
 
-module.exports.defaultHandler = (event, context, callback) => {
-  console.log('default handler', event, context);
-  callback(null, {
-    statusCode: 200,
-    body: "default handler was called."
-  });
-};
+module.exports.defaultHandler = chat_message_handler;

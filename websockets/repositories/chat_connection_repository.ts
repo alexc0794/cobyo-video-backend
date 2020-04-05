@@ -1,30 +1,31 @@
+import { ChatConnection } from '../interfaces/chat';
 import BaseRepository from './base_repository';
 
-type Chat = {
-  connection_id: string,
-  connected_at: string,
-};
 
 export default class ChatConnectionRepository extends BaseRepository {
 
   table_name = 'ChatConnections';
 
-  async create_chat_connection(connection_id): Promise<Chat> {
-    const item: Chat = {
+  async create_chat_connection(connection_id): Promise<ChatConnection> {
+    const SECONDS_IN_A_DAY = 60 * 60 * 24;
+    const seconds_since_epoch = Math.round(Date.now() / 1000);
+    const chat_connection: ChatConnection = {
       'connection_id': connection_id,
       'connected_at': (new Date()).toISOString(),
     };
-
     return new Promise((resolve, reject) =>
       this.aws_client.put({
         'TableName': this.table_name,
-        'Item': item
+        'Item': {
+          ...chat_connection,
+          'expiring_at': seconds_since_epoch + SECONDS_IN_A_DAY // Kill a chat connection after a day
+        }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to update ChatConnections', connection_id, err);
+          console.error('Failed to create connection', connection_id, err);
           return reject();
         }
-        return resolve(item);
+        return resolve(chat_connection);
       })
     );
   }
@@ -34,11 +35,11 @@ export default class ChatConnectionRepository extends BaseRepository {
       this.aws_client.delete({
         'TableName': this.table_name,
         'Key': {
-          'HashKey': connection_id,
+          'connection_id': connection_id,
         }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to delete ChatCOnnections', connection_id, err);
+          console.error('Failed to delete connection', connection_id, err);
           return reject();
         }
         return resolve();
@@ -46,5 +47,17 @@ export default class ChatConnectionRepository extends BaseRepository {
     );
   }
 
-
+  async get_connections(): Promise<Array<ChatConnection>> {
+    return new Promise((resolve, reject) =>
+      this.aws_client.scan({
+        'TableName': this.table_name,
+      }, (err, data) => {
+        if (err) {
+          console.error('Failed to get connections', err);
+          return reject();
+        }
+        return resolve(data.Items);
+      })
+    );
+  }
 }
