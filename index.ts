@@ -3,8 +3,8 @@
 **/
 import serverless from 'serverless-http';
 import express from 'express';
-import chat_connection_handler from './websockets/handlers/chat_connection_handler';
-import chat_message_handler from './websockets/handlers/chat_message_handler';
+import chat_connection_handler from './src/handlers/chat_connection_handler';
+import chat_message_handler from './src/handlers/chat_message_handler';
 import {IS_DEV, PORT} from './config';
 
 const app = express();
@@ -15,7 +15,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-require('./express/routes').default(app);
+require('./src/routes').default(app);
 
 if (IS_DEV) {
   app.listen(PORT, () => {
@@ -25,7 +25,7 @@ if (IS_DEV) {
     console.log(`http://localhost:${PORT}/token/1`);
     console.log(`http://localhost:${PORT}/table/1`);
     console.log(`http://localhost:${PORT}/table/1/keywords`);
-    // Add more here
+    console.log(`http://localhost:${PORT}/chat/messages`);
   });
 }
 

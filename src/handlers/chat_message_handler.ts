@@ -23,7 +23,6 @@ function extract_chat_message_input(body): ChatMessageInput {
 }
 
 export default async function chat_message_handler(event, context, callback) {
-  console.log(event, context, callback);
   let message, user_id;
   try {
     const input = extract_chat_message_input(event.body);

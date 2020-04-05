@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
 import { feature_overrides } from './middleware';
 import StorefrontRepository from '../repositories/storefront_repository';
 import moment from 'moment-timezone';

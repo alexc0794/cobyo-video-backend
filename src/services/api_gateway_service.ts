@@ -4,7 +4,6 @@ import { ChatMessage } from '../interfaces/chat';
 
 AWS.config.update(AWS_CONFIG);
 
-
 export default class ApiGatewayService {
 
   aws_client

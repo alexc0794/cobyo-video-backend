@@ -5,6 +5,7 @@ import table from './table';
 import transcript from './transcript';
 import user from './user';
 import storefront from './storefront';
+import chat from './chat';
 
 const router = Router();
 
@@ -26,6 +27,7 @@ export default (app: express.Application) => {
     res.send(token);
   });
 
+  chat(router);
   table(router);
   transcript(router);
   user(router);

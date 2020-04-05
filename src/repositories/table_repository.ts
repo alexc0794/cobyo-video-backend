@@ -14,7 +14,7 @@ export default class TableRepository extends BaseRepository {
           table_id
         }
       }, (err, data) => {
-        if (data && data.Item && data.Item) {
+        if (data && data.Item) {
           return resolve(data.Item);
         }
         console.error(`Could not find table ${table_id}`)
