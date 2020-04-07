@@ -48,20 +48,16 @@ export default class ChatMessageRepository extends BaseRepository {
     );
   }
 
-  get_messages(before_sent_at: string|null, limit: number): Promise<Array<ChatMessage>> {
-    const params = {
-      'TableName': this.table_name,
-      'Limit': limit,
-    };
-    if (before_sent_at) {
-      params['FilterExpression'] = 'sent_at < :before_sent_at';
-      params['ExpressionAttributeValues'] = {
-        ':before_sent_at': before_sent_at,
-      };
-    }
-
+  get_messages(before_sent_at: string, limit: number): Promise<Array<ChatMessage>> {
     return new Promise((resolve, reject) =>
-      this.aws_client.scan(params, (err, data) => {
+      this.aws_client.query({
+        'TableName': this.table_name,
+        'Limit': limit,
+        'KeyConditionExpression': 'sent_at < :before_sent_at',
+        'ExpressionAttributeValues': {
+          ':before_sent_at': before_sent_at,
+        }
+      }, (err, data) => {
         if (err) {
           console.error('Failed to get messages', limit, before_sent_at);
           return resolve([]);

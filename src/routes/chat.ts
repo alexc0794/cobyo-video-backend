@@ -21,7 +21,7 @@ export default (app: Router) => {
         before_chat_message = null;
       }
     }
-    const before_sent_at: string|null = before_chat_message ? before_chat_message.sent_at : null;
+    const before_sent_at = before_chat_message ? before_chat_message.sent_at : (new Date()).toISOString();
     const chat_messages = await chat_message_repository.get_messages(before_sent_at, limit);
 
     res.send({
