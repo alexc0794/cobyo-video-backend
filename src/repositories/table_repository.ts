@@ -76,4 +76,24 @@ export default class TableRepository extends BaseRepository {
     );
   }
 
+  async update_table_v2(payload): Promise<Table> {
+    const item = {
+      ...payload,
+      'last_updated_at': (new Date()).toISOString()
+    };
+
+    return new Promise((resolve, reject) =>
+      this.aws_client.put({
+        'TableName': this.table_name,
+        'Item': item
+      }, (err, data) => {
+        if (err) {
+          console.error('Failed to update table', payload.table_id, err);
+          return reject();
+        }
+
+        return resolve(item)
+      })
+    )
+  }
 }
