@@ -3,9 +3,12 @@ import { RtcTokenBuilder, RtcRole } from 'agora-access-token';
 import { AGORA_APP_ID, AGORA_APP_CERTIFICATE } from '../../config';
 import table from './table';
 import transcript from './transcript';
-import user from './user';
+import active_user from './users/active_user';
+import user from './users/user';
+import user_inventory from './users/user_inventory';
 import storefront from './storefront';
 import chat from './chat';
+import menu from './menu';
 
 const router = Router();
 
@@ -30,8 +33,11 @@ export default (app: express.Application) => {
   chat(router);
   table(router);
   transcript(router);
+  active_user(router);
   user(router);
+  user_inventory(router);
   storefront(router);
+  menu(router);
 
   app.use('/', router);
 };
