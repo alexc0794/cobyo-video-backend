@@ -6,9 +6,9 @@ import transcript from './transcript';
 import active_user from './users/active_user';
 import user from './users/user';
 import user_inventory from './users/user_inventory';
-import storefront from './storefront';
+import storefront from './storefront/storefront';
 import chat from './chat';
-import menu from './menu';
+import menu from './storefront/menu';
 
 const router = Router();
 
