@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
-import { authenticate } from './middleware';
-import { ACCESS_TOKEN_SECRET } from '../../config';
-import UserRepository from '../repositories/user_repository';
-import ActiveUserRepository from '../repositories/active_user_repository';
+import { ACCESS_TOKEN_SECRET } from '../../../config';
+import UserRepository from '../../repositories/user_repository';
+import ActiveUserRepository from '../../repositories/active_user_repository';
 
 function generate_random_uint_32() {
   return (Math.random() * 4294967296) >>> 0;
@@ -51,17 +50,6 @@ export default (app: Router) => {
       { expiresIn: '3h'}
     );
     return res.send({ user, token });
-  });
-
-  app.get('/active-users', authenticate, async function(req: any, res) {
-    const active_users = (await (new ActiveUserRepository()).get_active_users());
-    const user_ids = active_users.map(user => user.user_id);
-    const users = await (new UserRepository()).get_users_by_ids(user_ids);
-
-    return res.send(active_users.map((active_user, i) => ({
-      ...active_user,
-      ...users[i],
-    })));
   });
 
 }
