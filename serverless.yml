@@ -65,6 +65,10 @@ provider:
       - dynamodb:PutItem
       - dynamodb:DeleteItem
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChannelConnections"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChannelConnections/index/ConnectionChannelIndex"
 
 functions:
   app:

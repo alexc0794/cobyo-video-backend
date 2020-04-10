@@ -174,7 +174,19 @@ dynamodb.createTable(
     ProvisionedThroughput: {
       ReadCapacityUnits: 5,
       WriteCapacityUnits: 5
-    }
+    },
+    GlobalSecondaryIndexes: [{
+       // We want to check if a user has already logged in with their Facebook account before creating a new user account
+      IndexName: 'ConnectionChannelIndex',
+      KeySchema: [
+        { AttributeName: 'connection_id', KeyType: 'HASH' }
+      ],
+      Projection: { ProjectionType: 'KEYS_ONLY' }, // Should return channel_id and connection_id
+      ProvisionedThroughput: {
+          ReadCapacityUnits: 5,
+          WriteCapacityUnits: 5
+      }
+    }]
   },
   (err, data) => {
     if (err) {

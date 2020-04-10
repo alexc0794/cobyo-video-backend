@@ -50,6 +50,26 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
+  async get_channel_by_connection_id(connection_id: string): Promise<string|null> {
+    return new Promise((resolve, reject) =>
+      this.aws_client.query({
+        'TableName': this.table_name,
+        'IndexName': 'ConnectionChannelIndex',
+        'KeyConditionExpression': 'connection_id = :connection_id',
+        'ExpressionAttributeValues': { ':connection_id': connection_id },
+      }, (err, data) => {
+        if (err) {
+          console.error('Failed to get channel with connection id', connection_id, err);
+          return resolve(null);
+        }
+        if (data && data.Items && data.Items.length > 0) {
+          return resolve(data.Items[0].channel_id);
+        }
+        return resolve(null);
+      })
+    );
+  }
+
   async get_channel_connections(channel_id: string): Promise<Array<ChannelConnection>> {
     return new Promise((resolve, reject) =>
       this.aws_client.query({
