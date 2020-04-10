@@ -58,6 +58,13 @@ provider:
       - dynamodb:PutItem
       - dynamodb:UpdateItem
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChatMessages"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChannelConnections"
 
 functions:
   app:

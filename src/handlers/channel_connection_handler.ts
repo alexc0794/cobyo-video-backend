@@ -1,9 +1,10 @@
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
 
+const DEFAULT_CHANNEL_ID = 'room';
+
 export default async function channel_connection_handler(event, context, callback) {
-  console.log(event);
   const connection_id = event.requestContext.connectionId;
-  const channel_id = '1';
+  const channel_id = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
 
   if (event.requestContext.eventType === "CONNECT") {
     const success = await channel_connect(channel_id, connection_id);
