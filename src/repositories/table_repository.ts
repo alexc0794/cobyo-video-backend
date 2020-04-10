@@ -78,7 +78,8 @@ export default class TableRepository extends BaseRepository {
 
   async update_table_v2(payload): Promise<Table> {
     const item = {
-      ...payload,
+      ...payload.table,
+      name: payload.name,
       'last_updated_at': (new Date()).toISOString()
     };
 
@@ -91,8 +92,8 @@ export default class TableRepository extends BaseRepository {
           console.error('Failed to update table', payload.table_id, err);
           return reject();
         }
-
-        return resolve(item)
+        console.log("data ", data)
+        return resolve(data)
       })
     )
   }

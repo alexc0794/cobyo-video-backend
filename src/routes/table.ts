@@ -110,10 +110,11 @@ export default (app: Router) => {
   app.put('/table', async function (req, res) {
     const table_id = req.body.table_id
     const name = req.body.name
+    const table = await (new TableRepository()).get_table_by_id(table_id);
 
     try {
       const updated_table = await (new TableRepository()).update_table_v2({
-        table_id,
+        table,
         name
       });
 
