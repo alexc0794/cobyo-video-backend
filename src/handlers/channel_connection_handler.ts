@@ -3,17 +3,27 @@ import ChannelConnectionRepository from '../repositories/channel_connection_repo
 const DEFAULT_CHANNEL_ID = 'room';
 
 export default async function channel_connection_handler(event, context, callback) {
+  console.log(event, context);
   const connection_id = event.requestContext.connectionId;
   if (event.requestContext.eventType === "CONNECT") {
-    const channel_id = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
-    const user_id = event.queryStringParameters.userId;
-    if (!user_id) {
+    let channel_id, user_id;
+    if (event.queryStringParameters && event.queryStringParameters.channelIdUserId) {
+      const [ _channel_id, _user_id ] = event.queryStringParameters.channelIdUserId.split(',');
+      channel_id = _channel_id;
+      user_id = _user_id;
+    } else if (event.queryStringParameters && event.queryStringParameters.userId) {
+      channel_id = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
+      user_id = event.queryStringParameters.userId;
+    } else {
       return callback(null, { statusCode: 401 });
     }
+    console.log('connecting', channel_id, user_id);
+
     if (!await channel_connect(channel_id, connection_id, user_id)) {
       return callback(null, { statusCode: 500 });
     }
   } else if (event.requestContext.eventType === "DISCONNECT") {
+    console.log('disconnecting', connection_id);
     if (!await channel_disconnect(connection_id)) {
       return callback(null, { statusCode: 500 });
     }

@@ -3,6 +3,7 @@ import short from 'short-uuid';
 import chat_connection_handler, { chat_connect, chat_disconnect } from './src/handlers/chat_connection_handler';
 import chat_message_handler, { save_chat_message } from './src/handlers/chat_message_handler';
 import channel_connection_handler from './src/handlers/channel_connection_handler';
+import channel_action_handler from './src/handlers/channel_action_handler';
 import { IS_DEV, WS_PORT } from './config';
 
 if (IS_DEV) {
@@ -73,3 +74,4 @@ if (IS_DEV) {
 
 module.exports.connectionHandler = channel_connection_handler;
 module.exports.defaultHandler = chat_message_handler;
+module.exports.channelActionHandler = channel_action_handler;

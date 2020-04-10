@@ -87,3 +87,10 @@ functions:
     handler: build/websockets.defaultHandler
     events:
       - websocket: $default
+  channelHandler:
+    handler: build/websockets.channelActionHandler
+    events:
+      - websocket:
+          route: sendMessage
+      - websocket:
+          route: boughtMenuItem
