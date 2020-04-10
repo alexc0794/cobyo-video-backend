@@ -5,20 +5,21 @@ const DEFAULT_CHANNEL_ID = 'room';
 export default async function channel_connection_handler(event, context, callback) {
   const connection_id = event.requestContext.connectionId;
   const channel_id = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
+  const user_id = event.queryStringParameters.userId;
 
   if (event.requestContext.eventType === "CONNECT") {
-    const success = await channel_connect(channel_id, connection_id);
-    if (!success) {
+    if (!userId) {
+      return callback(null, { statusCode: 401 });
+    }
+    if (!await channel_connect(channel_id, connection_id, user_id)) {
       return callback(null, { statusCode: 500 });
     }
-    return callback(null, { statusCode: 200 });
   } else if (event.requestContext.eventType === "DISCONNECT") {
-    const success = await channel_disconnect(channel_id, connection_id);
-    if (!success) {
+    if (!await channel_disconnect(channel_id, connection_id)) {
       return callback(null, { statusCode: 500 });
     }
-    return callback(null, { statusCode: 200 });
   }
+  return callback(null, { statusCode: 200 });
 }
 
 export async function channel_connect(channel_id: string, connection_id: string): Promise<boolean> {

@@ -6,12 +6,13 @@ export default class ChannelConnectionRepository extends BaseRepository {
 
   table_name = 'ChannelConnections';
 
-  async create_channel_connection(channel_id: string, connection_id: string): Promise<ChannelConnection> {
+  async create_channel_connection(channel_id: string, connection_id: string, user_id: string): Promise<ChannelConnection> {
     const SECONDS_IN_A_DAY = 60 * 60 * 24;
     const seconds_since_epoch = Math.round(Date.now() / 1000);
     const channel_connection: ChannelConnection = {
       'channel_id': channel_id,
       'connection_id': connection_id,
+      'user_id': user_id,
       'connected_at': (new Date()).toISOString(),
     };
     return new Promise((resolve, reject) =>
