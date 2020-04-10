@@ -1,6 +1,7 @@
 import { MenuItemCategory } from '../enums/menu';
 
 export interface MenuItem {
+  itemId: string,
   name: string,
   cents: number,
   inventory: number,

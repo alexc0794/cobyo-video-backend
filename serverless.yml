@@ -93,4 +93,4 @@ functions:
       - websocket:
           route: sendMessage
       - websocket:
-          route: boughtMenuItem
+          route: purchaseMenuItem
