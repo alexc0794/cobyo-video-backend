@@ -11,19 +11,19 @@ export default class MenuRepository extends BaseRepository {
         return {
           items: [{
             name: 'Daiquiri',
-            cents: 10000,
+            cents: 1000,
             inventory: 1,
             category: MenuItemCategory.Drink,
             imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/daiquiri.png',
           }, {
             name: 'Midori Sour',
-            cents: 5000,
+            cents: 500,
             inventory: 1,
             category: MenuItemCategory.Drink,
             imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/midori.png',
           }, {
             name: 'Mojito',
-            cents: 7000,
+            cents: 700,
             inventory: 1,
             category: MenuItemCategory.Drink,
             imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/mojito.png',

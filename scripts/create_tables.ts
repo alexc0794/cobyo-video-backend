@@ -159,3 +159,28 @@ dynamodb.createTable(
     }
   }
 );
+
+dynamodb.createTable(
+  {
+    TableName: 'ChannelConnections',
+    KeySchema: [
+      { AttributeName: 'channel_id', KeyType: 'HASH' },
+      { AttributeName: 'connection_id', KeyType: 'RANGE' },
+    ],
+    AttributeDefinitions: [
+      { AttributeName: 'channel_id', AttributeType: 'S' },
+      { AttributeName: 'connection_id', AttributeType: 'S' },
+    ],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    }
+  },
+  (err, data) => {
+    if (err) {
+      console.error('Unable to create ChannelConnections', JSON.stringify(err, null, 2));
+    } else {
+      console.log("Created ChannelConnections", JSON.stringify(data, null, 2));
+    }
+  }
+);
