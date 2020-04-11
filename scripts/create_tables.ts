@@ -181,7 +181,7 @@ dynamodb.createTable(
       KeySchema: [
         { AttributeName: 'connection_id', KeyType: 'HASH' }
       ],
-      Projection: { ProjectionType: 'KEYS_ONLY' }, // Should return channel_id and connection_id
+      Projection: { ProjectionType: 'ALL' },
       ProvisionedThroughput: {
           ReadCapacityUnits: 5,
           WriteCapacityUnits: 5

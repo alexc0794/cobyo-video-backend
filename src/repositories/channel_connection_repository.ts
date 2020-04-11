@@ -6,7 +6,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
 
   table_name = 'ChannelConnections';
 
-  async create_channel_connection(channel_id: string, connection_id: string, user_id: string): Promise<ChannelConnection> {
+  async createChannelConnection(channel_id: string, connection_id: string, user_id: string): Promise<ChannelConnection> {
     const SECONDS_IN_A_DAY = 60 * 60 * 24;
     const seconds_since_epoch = Math.round(Date.now() / 1000);
     const channel_connection: ChannelConnection = {
@@ -32,7 +32,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
-  async remove_channel_connection(channel_id: string, connection_id: string): Promise<void> {
+  async removeChannelConnection(channel_id: string, connection_id: string): Promise<void> {
     return new Promise((resolve, reject) =>
       this.aws_client.delete({
         'TableName': this.table_name,
@@ -50,7 +50,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
-  async get_channel_by_connection_id(connection_id: string): Promise<string|null> {
+  async getChannelByConnectionId(connection_id: string): Promise<ChannelConnection|null> {
     return new Promise((resolve, reject) =>
       this.aws_client.query({
         'TableName': this.table_name,
@@ -63,7 +63,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
           return resolve(null);
         }
         if (data && data.Items && data.Items.length > 0) {
-          return resolve(data.Items[0].channel_id);
+          return resolve(data.Items[0]);
         }
         return resolve(null);
       })

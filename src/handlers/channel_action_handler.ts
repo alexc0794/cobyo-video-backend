@@ -4,6 +4,7 @@ import { ChatMessage } from '../interfaces/chat';
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
 import MenuRepository from '../repositories/menu_repository';
 import ApiGatewayService from '../services/api_gateway_service';
+import { broadcastToChannel } from './channel_helpers';
 
 export default async function channel_action_handler(event, context, callback) {
   try {
@@ -27,17 +28,9 @@ export default async function channel_action_handler(event, context, callback) {
   return callback(null, { statusCode: 200 });
 }
 
-async function _sendToConnections(event, channelId, payload) {
-  const channelConnectionRepository = new ChannelConnectionRepository();
-  const connections: Array<ChannelConnection> = await channelConnectionRepository.get_channel_connections(channelId);
-  const apiGatewayService = new ApiGatewayService(`${event.requestContext.domainName}/${event.requestContext.stage}`);
-  connections.forEach((connection: ChannelConnection) => {
-    apiGatewayService.send(connection.connection_id, payload);
-  });
-}
-
 async function sendMessage(event, context) {
   const body = JSON.parse(event.body);
+  const action = body.action;
   const channelId = body.channelId;
   const userId = body.userId;
   const message = body.message;
@@ -51,13 +44,17 @@ async function sendMessage(event, context) {
     sent_at: (new Date()).toISOString(),
     message
   };
-  await _sendToConnections(event, channelId, chatMessage);
+  await broadcastToChannel(event, channelId, {
+    ...chatMessage,
+    action,
+  });
 
   return Promise.resolve();
 }
 
 async function purchasedMenuItem(event, context) {
   const body = JSON.parse(event.body);
+  const action = body.action;
   const channelId = body.channelId;
   const itemId = body.itemId;
   const userId = body.userId;
@@ -75,7 +72,13 @@ async function purchasedMenuItem(event, context) {
   const apiGatewayService = new ApiGatewayService(`${event.requestContext.domainName}/${event.requestContext.stage}`);
   const connection: ChannelConnection|undefined = connections.find(connection => connection.user_id === userId);
   if (connection) {
-    apiGatewayService.send(connection.connection_id, { itemId, userId, fromUserId, menuItem });
+    apiGatewayService.send(connection.connection_id, {
+      action,
+      itemId,
+      userId,
+      fromUserId,
+      menuItem,
+    });
   } else {
     return Promise.reject();
   }

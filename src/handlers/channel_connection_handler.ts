@@ -1,54 +1,69 @@
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
+import { broadcastToChannel } from './channel_helpers';
 
 const DEFAULT_CHANNEL_ID = 'room';
 
-export default async function channel_connection_handler(event, context, callback) {
-  console.log(event, context);
-  const connection_id = event.requestContext.connectionId;
+export default async function channelConnectionHandler(event, context, callback) {
+  const connectionId = event.requestContext.connectionId;
+
   if (event.requestContext.eventType === "CONNECT") {
-    let channel_id, user_id;
+    let channelId, userId;
     if (event.queryStringParameters && event.queryStringParameters.channelIdUserId) {
-      const [ _channel_id, _user_id ] = event.queryStringParameters.channelIdUserId.split(',');
-      channel_id = _channel_id;
-      user_id = _user_id;
+      const [ _channelId, _userId ] = event.queryStringParameters.channelIdUserId.split(',');
+      channelId = _channelId;
+      userId = _userId;
     } else if (event.queryStringParameters && event.queryStringParameters.userId) {
-      channel_id = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
-      user_id = event.queryStringParameters.userId;
+      channelId = event.queryStringParameters.channelId || DEFAULT_CHANNEL_ID;
+      userId = event.queryStringParameters.userId;
     } else {
       return callback(null, { statusCode: 401 });
     }
-    console.log('connecting', channel_id, user_id);
-
-    if (!await channel_connect(channel_id, connection_id, user_id)) {
+    if (!await channelConnect(channelId, connectionId, userId)) {
       return callback(null, { statusCode: 500 });
     }
-  } else if (event.requestContext.eventType === "DISCONNECT") {
-    console.log('disconnecting', connection_id);
-    if (!await channel_disconnect(connection_id)) {
+    await broadcastToChannel(event, channelId, {
+      userId,
+      action: event.requestContext.eventType,
+    });
+  }
+
+  // Handle DISCONNECT
+  if (event.requestContext.eventType === "DISCONNECT") {
+    if (!await channelDisconnect(connectionId)) {
       return callback(null, { statusCode: 500 });
+    }
+    const channelConnection = await (new ChannelConnectionRepository()).getChannelByConnectionId(connectionId);
+    if (channelConnection) {
+      const { channel_id: channelId, user_id: userId } = channelConnection;
+      await broadcastToChannel(event, channelId, {
+        userId,
+        action: event.requestContext.eventType,
+      });
+    } else {
+      console.warn('Couldnt find channel connection to broadcast user disconnected', connectionId);
     }
   }
   return callback(null, { statusCode: 200 });
 }
 
-export async function channel_connect(channel_id: string, connection_id: string, user_id: string): Promise<boolean> {
+export async function channelConnect(channelId: string, connectionId: string, userId: string): Promise<boolean> {
   try {
-    const channel_connection_repository = new ChannelConnectionRepository();
-    await channel_connection_repository.create_channel_connection(channel_id, connection_id, user_id);
+    await (new ChannelConnectionRepository()).createChannelConnection(channelId, connectionId, userId);
   } catch {
     return false;
   }
   return true;
 }
 
-export async function channel_disconnect(connection_id: string): Promise<boolean> {
+export async function channelDisconnect(connectionId: string): Promise<boolean> {
   try {
-    const channel_connection_repository = new ChannelConnectionRepository();
-    const channel_id = await channel_connection_repository.get_channel_by_connection_id(connection_id);
-    if (!channel_id) {
+    const channelConnectionRepository = new ChannelConnectionRepository();
+    const channelConnection = await channelConnectionRepository.getChannelByConnectionId(connectionId);
+    if (!channelConnection) {
       return false;
     }
-    await channel_connection_repository.remove_channel_connection(channel_id, connection_id);
+    const channelId = channelConnection.channel_id;
+    await channelConnectionRepository.removeChannelConnection(channelId, connectionId);
   } catch {
     return false;
   }
