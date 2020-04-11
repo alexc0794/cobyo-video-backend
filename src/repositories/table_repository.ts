@@ -92,7 +92,6 @@ export default class TableRepository extends BaseRepository {
           console.error('Failed to update table', payload.table_id, err);
           return reject();
         }
-        console.log("data ", data)
         return resolve(data)
       })
     )
