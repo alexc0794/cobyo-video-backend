@@ -36,6 +36,8 @@ wscat -c ws://localhost:8888 // if successful, you should see "Connected (press 
 
 // Now send a message
 {"action": "chat_message", "message": "hi", "user_id": "1"} // if successful, you should see the message sent back to you
+
+{"action": "purchasedMenuItem", "fromUserId": "1", "itemId": "daquiri", "userId": "3935076807", "channelId": "club1b"}
 ```
 
 ## Deploying

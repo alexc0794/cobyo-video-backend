@@ -67,21 +67,14 @@ async function purchasedMenuItem(event, context) {
   if (!menuItem) {
     return Promise.reject();
   }
-  const channelConnectionRepository = new ChannelConnectionRepository();
-  const connections: Array<ChannelConnection> = await channelConnectionRepository.get_channel_connections(channelId);
-  const apiGatewayService = new ApiGatewayService(`${event.requestContext.domainName}/${event.requestContext.stage}`);
-  const connection: ChannelConnection|undefined = connections.find(connection => connection.user_id === userId);
-  if (connection) {
-    apiGatewayService.send(connection.connection_id, {
-      action,
-      itemId,
-      userId,
-      fromUserId,
-      menuItem,
-    });
-  } else {
-    return Promise.reject();
-  }
+
+  await broadcastToChannel(event, channelId, {
+    action,
+    itemId,
+    userId,
+    fromUserId,
+    menuItem,
+  });
 
   return Promise.resolve();
 }
