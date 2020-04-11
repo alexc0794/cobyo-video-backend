@@ -6,23 +6,23 @@ AWS.config.update(AWS_CONFIG);
 
 export default class ApiGatewayService {
 
-  aws_client
+  awsClient
 
   constructor(endpoint: string) {
-    this.aws_client = new AWS.ApiGatewayManagementApi({
+    this.awsClient = new AWS.ApiGatewayManagementApi({
       apiVersion: '2018-11-29',
       endpoint
     });
   }
 
-  async send(connection_id: string, chat_message: ChatMessage) {
+  async send(connectionId: string, payload: any) {
     try {
-      await this.aws_client.postToConnection({
-        'ConnectionId': connection_id,
-        'Data': JSON.stringify(chat_message),
+      await this.awsClient.postToConnection({
+        'ConnectionId': connectionId,
+        'Data': JSON.stringify(payload),
       }).promise();
     } catch (e) {
-      console.warn('Failed to send message', connection_id, JSON.stringify(chat_message), e);
+      console.warn('Failed to send', connectionId, JSON.stringify(payload), e);
     }
   }
 }
