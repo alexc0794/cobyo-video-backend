@@ -50,14 +50,14 @@ export default class TableRepository extends BaseRepository {
   async update_table(
     table_id: string,
     seats: Array<Seat|null>,
-    name: string,
+    table_name: string,
     connection: Connection,
     shape: Shape,
   ): Promise<Table> {
     const item = {
       'table_id': table_id,
       'seats': seats,
-      'name': name,
+      'table_name': table_name,
       'last_updated_at': (new Date()).toISOString(),
       'connection': connection,
       'shape': shape,
@@ -76,4 +76,25 @@ export default class TableRepository extends BaseRepository {
     );
   }
 
+  async update_table_name(table_id: string, name: string): Promise<Table> {
+    return new Promise((resolve, reject) =>
+      this.aws_client.update({
+        'TableName': this.table_name,
+        'Key': {
+          'table_id': table_id,
+        },
+        'UpdateExpression': 'SET table_name = :name',
+        'ExpressionAttributeValues': {
+          ':name': name,
+        },
+        'ReturnValues': 'ALL_NEW',
+      }, (err, data) => {
+        if (err) {
+          console.error('Failed to update table', table_id, name, err);
+          return reject();
+        }
+        return resolve(data.Attributes);
+      })
+    )
+  }
 }

@@ -9,7 +9,7 @@ export interface Seat {
 export default interface Table {
   table_id: string,
   seats: Array<Seat|null>,
-  name: string,
+  table_name: string,
   last_updated_at: string,
   shape: Shape,
   connection: Connection
