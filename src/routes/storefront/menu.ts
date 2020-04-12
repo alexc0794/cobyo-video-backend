@@ -34,4 +34,17 @@ export default (app: Router) => {
       menu,
     });
   });
+
+  app.post('/menu/purchase', async function (req, res) {
+    const fromUserId: string = req.body.fromUserId;
+    const toUserIds: Array<string> = req.body.toUserIds;
+    const itemId: string = req.body.itemId;
+
+    // TODO: Validate user can purchase it and send to recipients.
+    // TODO: Update user inventory
+
+    res.send({
+      toUserIds,
+    });
+  });
 }
