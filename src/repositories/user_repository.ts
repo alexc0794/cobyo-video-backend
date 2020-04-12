@@ -66,24 +66,30 @@ export default class UserRepository extends BaseRepository {
   async create_user(
     user_id: string,
     facebook_user_id: string|null,
-    email: string,
+    email: string|null,
     first_name: string,
-    last_name: string,
+    last_name: string|null,
     profile_picture_url: string|null,
   ): Promise<User|undefined> {
     const item = {
-      'user_id': user_id,
-      'facebook_user_id': facebook_user_id,
-      'email': email,
-      'first_name': first_name,
-      'last_name': last_name,
-      'profile_picture_url': profile_picture_url,
+      user_id,
+      facebook_user_id,
+      email,
+      first_name,
+      last_name,
+      profile_picture_url,
       'created_at': (new Date()).toISOString(),
     };
+    const filteredItem = Object.keys(item).reduce((acc: any, key: string) => {
+      if (item[key] !== null) {
+          return { ...acc, [key]: item[key] };
+      }
+      return acc;
+    }, {});
     return new Promise((resolve, reject) =>
       this.aws_client.put({
         'TableName': this.table_name,
-        'Item': item
+        'Item': filteredItem
       }, (err, data) => {
         if (err) {
           console.error('Failed to create user', user_id, err);

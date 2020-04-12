@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../../config';
+import User from '../../interfaces/user';
 import UserRepository from '../../repositories/user_repository';
 import ActiveUserRepository from '../../repositories/active_user_repository';
 
@@ -46,6 +47,27 @@ export default (app: Router) => {
 
     const token = jwt.sign(
       { user_id: user.user_id, facebook_user_id },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: '3h'}
+    );
+    return res.send({ user, token });
+  });
+
+  app.get('/user/guest/:user_id', async function(req, res) {
+    const userId = req.params.user_id;
+    const user: User|null = await (new UserRepository()).get_user_by_id(userId);
+    if (!user) {
+      return res.status(500).send({ error: `Failed to find guest user ${userId}` });
+    }
+
+    try {
+      await (new ActiveUserRepository()).update_active_user(userId);
+    } catch {
+      console.error(`Failed to make user active but was successful in creating user ${user.user_id}`);
+    }
+
+    const token = jwt.sign(
+      { user_id: user.user_id },
       ACCESS_TOKEN_SECRET,
       { expiresIn: '3h'}
     );
