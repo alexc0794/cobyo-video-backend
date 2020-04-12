@@ -1,4 +1,6 @@
 import serverless from 'serverless-http';
+import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import { IS_DEV, EXPRESS_PORT } from './config';
 
@@ -14,14 +16,18 @@ app.use(function(req, res, next) {
 require('./src/routes').default(app);
 
 if (IS_DEV) {
-  app.listen(EXPRESS_PORT, () => {
+  https.createServer({
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert')
+  },
+  app).listen(EXPRESS_PORT, () => {
     console.log('List of available endpoints:');
     console.log();
-    console.log(`http://localhost:${EXPRESS_PORT}/storefront`);
-    console.log(`http://localhost:${EXPRESS_PORT}/token/1`);
-    console.log(`http://localhost:${EXPRESS_PORT}/table/1`);
-    console.log(`http://localhost:${EXPRESS_PORT}/table/1/keywords`);
-    console.log(`http://localhost:${EXPRESS_PORT}/chat/messages`);
+    console.log(`https://localhost:${EXPRESS_PORT}/storefront`);
+    console.log(`https://localhost:${EXPRESS_PORT}/token/1`);
+    console.log(`https://localhost:${EXPRESS_PORT}/table/1`);
+    console.log(`https://localhost:${EXPRESS_PORT}/table/1/keywords`);
+    console.log(`https://localhost:${EXPRESS_PORT}/chat/messages`);
   });
 }
 
