@@ -25,10 +25,13 @@ openssl req -nodes -new -x509 -keyout server.key -out server.cert
 ### DynamoDB
 Install [AWS CLI](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.CLI.html) and [local DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
 
-Create DynamoDB tables locally by adding the command in `scripts/create_tables.ts`.
+Create DynamoDB tables locally by adding the appropriate commands in in `scripts/create_tables.ts` and `scripts/delete_tables.ts`.
 ```
-// Build local changes and run the script
+// Create tables
 npm run ddb
+
+// Or more aggressively, delete tables and create new ones
+npm run ddbr
 ```
 
 ### WebSockets
