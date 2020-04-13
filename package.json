@@ -26,8 +26,8 @@
     "build": "npm run tsc",
     "dev": "export NODE_ENV=development && npm run build && npm run start",
     "ws": "export NODE_ENV=development && npm run build && node build/websockets.js",
-    "ddb": "export NODE_ENV=development && npm run build && node build/scripts/create_tables.js",
-    "ddbr": "export NODE_ENV=development && npm run build && node build/scripts/delete_tables.js && node build/scripts/create_tables.js",
+    "ddb": "export NODE_ENV=development && npm run build && node build/scripts/create_tables.js && node build/scripts/populate_tables.js",
+    "ddbr": "export NODE_ENV=development && npm run build && node build/scripts/delete_tables.js && npm run ddb",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "deploy": "npm run build && serverless deploy"
