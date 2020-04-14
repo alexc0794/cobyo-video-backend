@@ -13,6 +13,7 @@ const TABLE_NAMES = [
   'Tables',
   'Transcripts',
   'Users',
+  'UserInventory',
 ];
 
 function deleteTable(tableName: string): void {

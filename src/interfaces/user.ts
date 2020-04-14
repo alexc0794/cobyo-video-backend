@@ -5,4 +5,14 @@ export default interface User {
   first_name: string,
   last_name: string|null,
   profile_picture_url: string|null,
+  wallet_in_cents: number,
+};
+
+export interface InventoryItem {
+  userId: string,
+  itemId: string,
+  fromUserId: string,
+  purchasedAt: string,
+  itemIdPurchasedAt: string,
+  expiringAtSeconds: number,
 };

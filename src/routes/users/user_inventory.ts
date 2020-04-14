@@ -1,15 +1,21 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 import { authenticate } from '../middleware';
-import UserRepository from '../../repositories/user_repository';
-import ActiveUserRepository from '../../repositories/active_user_repository';
+import { InventoryItem } from '../../interfaces/user';
+import UserInventoryRepository from '../../repositories/users/user_inventory_repository';
 
 export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/user-inventory/:user_id', authenticate, async function(req: any, res) {
-    return res.sendStatus(501);
+  app.get('/user-inventory', authenticate, async function(req: any, res) {
+    const userId: string = req.user.user_id;
+    try {
+      const inventoryItems: Array<InventoryItem> = await (new UserInventoryRepository()).getInventoryByUserId(userId);
+      return res.send({ inventoryItems });
+    } catch {
+      return res.status(500).send({ inventoryItems: [] });
+    }
   });
-  
+
 }

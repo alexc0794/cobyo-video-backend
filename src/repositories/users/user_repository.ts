@@ -1,5 +1,5 @@
-import BaseRepository from './base_repository';
-import User from '../interfaces/user';
+import BaseRepository from '../base_repository';
+import User from '../../interfaces/user';
 
 export default class UserRepository extends BaseRepository {
 
@@ -70,6 +70,7 @@ export default class UserRepository extends BaseRepository {
     first_name: string,
     last_name: string|null,
     profile_picture_url: string|null,
+    wallet_in_cents: number,
   ): Promise<User|undefined> {
     const item = {
       user_id,
@@ -78,6 +79,7 @@ export default class UserRepository extends BaseRepository {
       first_name,
       last_name,
       profile_picture_url,
+      wallet_in_cents,
       'created_at': (new Date()).toISOString(),
     };
     const filteredItem = Object.keys(item).reduce((acc: any, key: string) => {
@@ -96,6 +98,29 @@ export default class UserRepository extends BaseRepository {
           return reject();
         }
         return resolve(item);
+      })
+    );
+  }
+
+  async updateUserWallet(userId: string, differenceInCents: number): Promise<number> {
+    return new Promise((resolve, reject) =>
+      this.aws_client.update({
+        'TableName': this.table_name,
+        'Key': {
+          'user_id': userId,
+        },
+        'UpdateExpression': 'SET wallet_in_cents = wallet_in_cents + :differenceInCents',
+        'ConditionExpression': 'wallet_in_cents >= :minimumWallet',
+        'ExpressionAttributeValues': {
+          ':differenceInCents': differenceInCents,
+          ':minimumWallet': -1 * differenceInCents,
+        },
+        'ReturnValues': 'UPDATED_NEW',
+      }, (err, data) => {
+        if (err || !('wallet_in_cents' in data.Attributes)) {
+          return reject();
+        }
+        return resolve(data.Attributes['wallet_in_cents']);
       })
     );
   }

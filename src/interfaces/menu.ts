@@ -7,6 +7,7 @@ export interface MenuItem {
   inventory: number,
   category: MenuItemCategory,
   imageUrl: string,
+  expirationInSeconds: number,
 };
 
 export interface Menu {
