@@ -1,4 +1,4 @@
-import BaseRepository from './base_repository';
+import BaseRepository from '../base_repository';
 
 type ActiveUser = {
   user_id: string,

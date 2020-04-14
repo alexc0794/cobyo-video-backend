@@ -5,8 +5,8 @@ import { IS_DEV } from '../../config';
 import { Connection, Shape, DEFAULT_CONNECTION, DEFAULT_SHAPE} from '../enums/table';
 import Table, { Seat } from '../interfaces/table';
 import TableRepository from '../repositories/table_repository';
-import UserRepository from '../repositories/user_repository';
-import ActiveUserRepository from '../repositories/active_user_repository';
+import UserRepository from '../repositories/users/user_repository';
+import ActiveUserRepository from '../repositories/users/active_user_repository';
 
 const SEAT_INACTIVITY_EXPIRATION_IN_SECONDS = IS_DEV ? 10 : 60; // expire seat
 
@@ -110,7 +110,7 @@ export default (app: Router) => {
   app.put('/table', async function (req, res) {
     const table_id = req.body.table_id
     const name = req.body.name
-    
+
     try {
       const updated_table = await (new TableRepository()).update_table_name(table_id, name);
       return res.send(updated_table)

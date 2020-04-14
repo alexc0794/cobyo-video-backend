@@ -11,6 +11,7 @@ const TABLES_WITH_TTL = [
   'ChatConnections',
   'ChatMessages',
   'Transcripts',
+  'UserInventory',
 ];
 
 function createTable(params: any): void {
@@ -169,4 +170,20 @@ createTable({
         WriteCapacityUnits: 5
     }
   }]
+});
+
+createTable({
+  TableName: 'UserInventory',
+  KeySchema: [
+    { AttributeName: 'userId', KeyType: 'HASH' },
+    { AttributeName: 'itemIdPurchasedAt', KeyType: 'RANGE' },
+  ],
+  AttributeDefinitions: [
+    { AttributeName: 'userId', AttributeType: 'S' },
+    { AttributeName: 'itemIdPurchasedAt', AttributeType: 'S' },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5
+  },
 });

@@ -13,6 +13,7 @@ export default class MenuRepository extends BaseRepository {
       inventory: 1,
       category: MenuItemCategory.Drink,
       imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/daiquiri.png',
+      expirationInSeconds: 1800 // 30 minutes
     },
     'midori-sour': {
       itemId: 'midori-sour',
@@ -21,6 +22,7 @@ export default class MenuRepository extends BaseRepository {
       inventory: 1,
       category: MenuItemCategory.Drink,
       imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/midori.png',
+      expirationInSeconds: 1800 // 30 minutes
     },
     'mojito': {
       itemId: 'mojito',
@@ -29,6 +31,7 @@ export default class MenuRepository extends BaseRepository {
       inventory: 1,
       category: MenuItemCategory.Drink,
       imageUrl: 'https://cobyo-video-images.s3.amazonaws.com/menu/mojito.png',
+      expirationInSeconds: 1800 // 30 minutes
     }
   }
 

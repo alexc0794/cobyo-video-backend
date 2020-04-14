@@ -3,8 +3,11 @@ import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../../config';
 import User from '../../interfaces/user';
-import UserRepository from '../../repositories/user_repository';
-import ActiveUserRepository from '../../repositories/active_user_repository';
+import UserRepository from '../../repositories/users/user_repository';
+import ActiveUserRepository from '../../repositories/users/active_user_repository';
+
+const FACEBOOK_USER_INITIAL_WALLET_IN_DOLLARS = 1000;
+const GUEST_USER_INITIAL_WALLET_IN_DOLLARS = 500;
 
 function generate_random_uint_32() {
   return (Math.random() * 4294967296) >>> 0;
@@ -21,10 +24,15 @@ export default (app: Router) => {
     let user_id = await user_repository.get_user_id_by_facebook_user_id(facebook_user_id);
     let user;
     if (user_id) {
+      // Detected an existing user
       user = await user_repository.get_user_by_id(user_id);
     } else {
+      // New user
       user_id = generate_random_uint_32().toString();
       const { first_name, last_name, email, profile_picture_url } = req.body;
+      const wallet_in_cents = (
+        facebook_user_id ? FACEBOOK_USER_INITIAL_WALLET_IN_DOLLARS : GUEST_USER_INITIAL_WALLET_IN_DOLLARS
+      ) * 100;
       try {
         user = await user_repository.create_user(
           user_id,
@@ -33,6 +41,7 @@ export default (app: Router) => {
           first_name,
           last_name,
           profile_picture_url,
+          wallet_in_cents,
         );
       } catch {
         return res.status(500).send({ error: `Failed to create user ${user.user_id}`});
