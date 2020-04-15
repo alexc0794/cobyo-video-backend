@@ -4,23 +4,27 @@ import BaseRepository from './base_repository';
 
 export default class ChannelConnectionRepository extends BaseRepository {
 
-  table_name = 'ChannelConnections';
+  tableName = 'ChannelConnections';
 
-  async createChannelConnection(channelId: string, connectionId: string, userId: string): Promise<ChannelConnection> {
+  async createChannelConnection(
+    channelId: string,
+    connectionId: string,
+    userId: string,
+  ): Promise<ChannelConnection> {
     const SECONDS_IN_A_DAY = 60 * 60 * 24;
     const secondsSinceEpoch = Math.round(Date.now() / 1000);
     const channelConnection: ChannelConnection = {
-      'channel_id': channelId,
-      'connection_id': connectionId,
-      'user_id': userId,
-      'connected_at': (new Date()).toISOString(),
+      channelId,
+      connectionId,
+      userId,
+      connectedAt: (new Date()).toISOString(),
     };
     return new Promise((resolve, reject) =>
-      this.aws_client.put({
-        'TableName': this.table_name,
-        'Item': {
+      this.awsClient.put({
+        TableName: this.tableName,
+        Item: {
           ...channelConnection,
-          'expiring_at': secondsSinceEpoch + SECONDS_IN_A_DAY // Kill a channel connection after a day
+          expiringAtSeconds: secondsSinceEpoch + SECONDS_IN_A_DAY // Kill a channel connection after a day
         }
       }, (err, data) => {
         if (err) {
@@ -32,31 +36,28 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
-  async removeChannelConnection(channelId: string, connectionId: string): Promise<void> {
+  async removeChannelConnection(channelId: string, connectionId: string): Promise<boolean> {
     return new Promise((resolve, reject) =>
-      this.aws_client.delete({
-        'TableName': this.table_name,
-        'Key': {
-          'channel_id': channelId,
-          'connection_id': connectionId,
-        }
+      this.awsClient.delete({
+        TableName: this.tableName,
+        Key: { channelId, connectionId }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to delete connection', connectionId, channelId, err);
-          return reject();
+          console.error('Failed to delete connection', channelId, connectionId, err);
+          return resolve(false);
         }
-        return resolve();
+        return resolve(true);
       })
     );
   }
 
   async getChannelByConnectionId(connectionId: string): Promise<ChannelConnection|null> {
     return new Promise((resolve, reject) =>
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'IndexName': 'ConnectionChannelIndex',
-        'KeyConditionExpression': 'connection_id = :connection_id',
-        'ExpressionAttributeValues': { ':connection_id': connectionId },
+      this.awsClient.query({
+        TableName: this.tableName,
+        IndexName: 'ConnectionChannelIndex',
+        KeyConditionExpression: 'connectionId = :connectionId',
+        ExpressionAttributeValues: { ':connectionId': connectionId },
       }, (err, data) => {
         if (err) {
           console.error('Failed to get channel with connection id', connectionId, err);
@@ -72,16 +73,16 @@ export default class ChannelConnectionRepository extends BaseRepository {
 
   async getChannelConnections(channelId: string): Promise<Array<ChannelConnection>> {
     return new Promise((resolve, reject) =>
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'KeyConditionExpression': 'channel_id = :channel_id',
-        'ExpressionAttributeValues': {
-          ':channel_id': channelId,
+      this.awsClient.query({
+        TableName: this.tableName,
+        KeyConditionExpression: 'channelId = :channelId',
+        ExpressionAttributeValues: {
+          ':channelId': channelId,
         }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to get connections', err);
-          return reject();
+          console.error('Failed to get channel connections', channelId, err);
+          return resolve([]);
         }
         return resolve(data.Items);
       })

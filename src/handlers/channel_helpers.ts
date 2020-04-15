@@ -7,7 +7,7 @@ export async function broadcastToChannel(event, channelId, payload): Promise<Arr
   const connections: Array<ChannelConnection> = await channelConnectionRepository.getChannelConnections(channelId);
   const apiGatewayService = new ApiGatewayService(`${event.requestContext.domainName}/${event.requestContext.stage}`);
   connections.forEach((connection: ChannelConnection) => {
-    apiGatewayService.send(connection.connection_id, payload);
+    apiGatewayService.send(connection.connectionId, payload);
   });
   return connections;
 }

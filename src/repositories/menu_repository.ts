@@ -35,12 +35,10 @@ export default class MenuRepository extends BaseRepository {
     }
   }
 
-  get_menu_by_storefront(storefront: Storefront): Menu {
+  getMenuByStorefront(storefront: Storefront): Menu {
     switch (storefront) {
       case Storefront.Club:
-        return {
-          items: ['daquiri', 'midori-sour', 'mojito'].map(itemId => this.items[itemId])
-        };
+        return { items: Object.keys(this.items).map(itemId => this.items[itemId]) };
       default:
         return {
           items: [],
@@ -48,7 +46,7 @@ export default class MenuRepository extends BaseRepository {
     }
   }
 
-  getMenuByItemId(itemId: string) : MenuItem|null {
+  getMenuItemById(itemId: string) : MenuItem|null {
     return itemId in this.items ? this.items[itemId] : null;
   }
 }

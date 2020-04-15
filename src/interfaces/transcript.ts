@@ -1,5 +1,5 @@
-export default interface Transcript {
+export interface Transcript {
   body: string,
-  table_id: string,
-  added_at: string,
+  channelId: string,
+  addedAt: string,
 };

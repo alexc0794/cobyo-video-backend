@@ -1,20 +1,10 @@
+import { TABLE_NAMES } from './shared';
 import { AWS_CONFIG } from '../config';
 
 const AWS = require('aws-sdk');
 AWS.config.update(AWS_CONFIG);
 
 const dynamodb = new AWS.DynamoDB();
-
-const TABLE_NAMES = [
-  'ActiveUsers',
-  'ChannelConnections',
-  'ChatConnections',
-  'ChatMessages',
-  'Tables',
-  'Transcripts',
-  'Users',
-  'UserInventory',
-];
 
 function deleteTable(tableName: string): void {
   dynamodb.deleteTable({ TableName: tableName }, (err, data) => {

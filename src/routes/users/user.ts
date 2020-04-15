@@ -1,15 +1,15 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../../config';
-import User from '../../interfaces/user';
+import { User } from '../../interfaces';
 import UserRepository from '../../repositories/users/user_repository';
 import ActiveUserRepository from '../../repositories/users/active_user_repository';
 
 const FACEBOOK_USER_INITIAL_WALLET_IN_DOLLARS = 1000;
 const GUEST_USER_INITIAL_WALLET_IN_DOLLARS = 500;
 
-function generate_random_uint_32() {
+function generateRandomUint32() {
   return (Math.random() * 4294967296) >>> 0;
 }
 
@@ -17,70 +17,74 @@ export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  // Post a full update to the state of table
-  app.post('/user/create', async function(req, res) {
-    const facebook_user_id = req.body.facebook_user_id;
-    const user_repository = new UserRepository();
-    let user_id = await user_repository.get_user_id_by_facebook_user_id(facebook_user_id);
-    let user;
-    if (user_id) {
+  type CreateUserResponse = {
+    user: User|null,
+    token: string,
+  };
+
+  app.post('/user', async function(req: Request, res: Response) {
+    const facebookUserId = req.body.facebookUserId;
+    const userRepository = new UserRepository();
+    let userId: string|null = facebookUserId ? await userRepository.getUserIdByFacebookUserId(facebookUserId) : null;
+    let user: User|null;
+    if (userId) {
       // Detected an existing user
-      user = await user_repository.get_user_by_id(user_id);
+      user = await userRepository.getUserById(userId);
     } else {
       // New user
-      user_id = generate_random_uint_32().toString();
-      const { first_name, last_name, email, profile_picture_url } = req.body;
-      const wallet_in_cents = (
-        facebook_user_id ? FACEBOOK_USER_INITIAL_WALLET_IN_DOLLARS : GUEST_USER_INITIAL_WALLET_IN_DOLLARS
+      userId = generateRandomUint32().toString();
+      const { firstName, lastName, email, profilePictureUrl } = req.body;
+      const walletInCents = (
+        facebookUserId ? FACEBOOK_USER_INITIAL_WALLET_IN_DOLLARS : GUEST_USER_INITIAL_WALLET_IN_DOLLARS
       ) * 100;
       try {
-        user = await user_repository.create_user(
-          user_id,
-          facebook_user_id,
+        user = await userRepository.createUser(
+          userId,
+          facebookUserId,
           email,
-          first_name,
-          last_name,
-          profile_picture_url,
-          wallet_in_cents,
+          firstName,
+          lastName,
+          profilePictureUrl,
+          walletInCents,
         );
       } catch {
-        return res.status(500).send({ error: `Failed to create user ${user.user_id}`});
+        return res.status(500).send({ error: `Failed to create user ${userId}`});
       }
     }
 
-    try {
-      await (new ActiveUserRepository()).update_active_user(user.user_id);
-    } catch {
-      console.error(`Failed to make user active but was successful in creating user ${user.user_id}`);
-    }
+    const didUpdate: boolean = await (new ActiveUserRepository()).updateActiveUser(userId);
+    didUpdate && console.error(`Failed to make user active but was successful in creating user ${userId}`);
 
-    const token = jwt.sign(
-      { user_id: user.user_id, facebook_user_id },
+    const token: string = jwt.sign(
+      { userId, facebookUserId },
       ACCESS_TOKEN_SECRET,
       { expiresIn: '3h'}
     );
-    return res.send({ user, token });
+
+    const response: CreateUserResponse = { user, token };
+    return res.send(response);
   });
 
-  app.get('/user/guest/:user_id', async function(req, res) {
-    const userId = req.params.user_id;
-    const user: User|null = await (new UserRepository()).get_user_by_id(userId);
+  type GetUserResponse = CreateUserResponse;
+
+  app.get('/user/:userId', async function(req: Request, res: Response) {
+    const userId = req.params.userId;
+    const user: User|null = await (new UserRepository()).getUserById(userId);
     if (!user) {
       return res.status(500).send({ error: `Failed to find guest user ${userId}` });
     }
 
-    try {
-      await (new ActiveUserRepository()).update_active_user(userId);
-    } catch {
-      console.error(`Failed to make user active but was successful in creating user ${user.user_id}`);
-    }
+    const didUpdate: boolean = await (new ActiveUserRepository()).updateActiveUser(userId);
+    didUpdate && console.error(`Failed to make user active but was successful in creating user ${userId}`);
 
     const token = jwt.sign(
-      { user_id: user.user_id },
+      { userId },
       ACCESS_TOKEN_SECRET,
       { expiresIn: '3h'}
     );
-    return res.send({ user, token });
+
+    const response: GetUserResponse = { user, token };
+    return res.send(response);
   });
 
 }

@@ -5,11 +5,11 @@ AWS.config.update(AWS_CONFIG);
 
 export default abstract class BaseRepository {
 
-  table_name?: string;
+  tableName?: string;
 
-  aws_client
+  awsClient
 
   constructor() {
-    this.aws_client = new AWS.DynamoDB.DocumentClient()
+    this.awsClient = new AWS.DynamoDB.DocumentClient()
   }
 }

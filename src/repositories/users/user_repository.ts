@@ -1,86 +1,86 @@
 import BaseRepository from '../base_repository';
-import User from '../../interfaces/user';
+import { User } from '../../interfaces/user';
 
 export default class UserRepository extends BaseRepository {
 
-  table_name = 'Users';
+  tableName = 'Users';
 
-  async get_user_by_id(user_id: string): Promise<User|null> {
+  async getUserById(userId: string): Promise<User|null> {
     return new Promise((resolve, reject) =>
-      this.aws_client.get({
-        'TableName': this.table_name,
-        'Key': {
-          user_id
+      this.awsClient.get({
+        TableName: this.tableName,
+        Key: {
+          userId
         }
       }, (err, data) => {
         if (data && data.Item && data.Item) {
           return resolve(data.Item);
         }
-        console.error(`Could not find user ${user_id}`)
         return resolve(null);
       })
     );
   }
 
-  async get_users_by_ids(user_ids: Array<string>): Promise<Array<User>> {
-    if (user_ids.length === 0) {
-        return Promise.resolve([]);
+  async getUsersByIds(userIds: Array<string>): Promise<Array<User>> {
+    if (!userIds.length) {
+      return Promise.resolve([]);
     }
-
     return new Promise((resolve, reject) =>
-      this.aws_client.batchGet({
-        'RequestItems': {
-          [this.table_name]: {
-            'Keys': user_ids.map(user_id => ({
-              'user_id': user_id,
-            }))
+      this.awsClient.batchGet({
+        RequestItems: {
+          [this.tableName]: {
+            Keys: userIds.map(userId => ({ userId }))
           }
         }
       }, (err, data) => {
-        if (data && data.Responses && data.Responses[this.table_name]) {
-          return resolve(data.Responses[this.table_name]);
+        if (err) {
+          console.error('Could not get users by ids', userIds, err);
+          return resolve([]);
         }
-        console.error(err);
-        return resolve([]);
+        return resolve(data.Responses[this.tableName]);
       })
     );
   }
 
   // Given a facebook user id, return a user id if it exists
-  async get_user_id_by_facebook_user_id(facebook_user_id: string): Promise<string|null> {
+  async getUserIdByFacebookUserId(facebookUserId: string): Promise<string|null> {
     return new Promise((resolve, reject) =>
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'IndexName': 'FacebookUserIndex',
-        'KeyConditionExpression': 'facebook_user_id = :fbuid',
-        'ExpressionAttributeValues': { ':fbuid': facebook_user_id },
+      this.awsClient.query({
+        TableName: this.tableName,
+        IndexName: 'FacebookUserIndex',
+        KeyConditionExpression: 'facebookUserId = :facebookUserId',
+        ExpressionAttributeValues: { ':facebookUserId': facebookUserId },
       }, (err, data) => {
+        if (err) {
+          console.error('Could not get user id by facebook user id', facebookUserId, err);
+          return resolve(null);
+        }
         if (data && data.Items && data.Items.length > 0) {
-          return resolve(data.Items[0].user_id);
+          return resolve(data.Items[0].userId);
         }
         return resolve(null);
       })
     );
   }
 
-  async create_user(
-    user_id: string,
-    facebook_user_id: string|null,
+  async createUser(
+    userId: string,
+    facebookUserId: string|null,
     email: string|null,
-    first_name: string,
-    last_name: string|null,
-    profile_picture_url: string|null,
-    wallet_in_cents: number,
-  ): Promise<User|undefined> {
+    firstName: string,
+    lastName: string|null,
+    profilePictureUrl: string|null,
+    walletInCents: number,
+  ): Promise<User|null> {
     const item = {
-      user_id,
-      facebook_user_id,
+      userId,
+      facebookUserId,
       email,
-      first_name,
-      last_name,
-      profile_picture_url,
-      wallet_in_cents,
-      'created_at': (new Date()).toISOString(),
+      firstName,
+      lastName,
+      profilePictureUrl,
+      walletInCents,
+      createdAt: (new Date()).toISOString(),
     };
     const filteredItem = Object.keys(item).reduce((acc: any, key: string) => {
       if (item[key] !== null) {
@@ -89,13 +89,13 @@ export default class UserRepository extends BaseRepository {
       return acc;
     }, {});
     return new Promise((resolve, reject) =>
-      this.aws_client.put({
-        'TableName': this.table_name,
-        'Item': filteredItem
+      this.awsClient.put({
+        TableName: this.tableName,
+        Item: filteredItem
       }, (err, data) => {
         if (err) {
-          console.error('Failed to create user', user_id, err);
-          return reject();
+          console.error('Failed to create user', userId, err);
+          return reject(null);
         }
         return resolve(item);
       })
@@ -104,23 +104,25 @@ export default class UserRepository extends BaseRepository {
 
   async updateUserWallet(userId: string, differenceInCents: number): Promise<number> {
     return new Promise((resolve, reject) =>
-      this.aws_client.update({
-        'TableName': this.table_name,
-        'Key': {
-          'user_id': userId,
-        },
-        'UpdateExpression': 'SET wallet_in_cents = wallet_in_cents + :differenceInCents',
-        'ConditionExpression': 'wallet_in_cents >= :minimumWallet',
-        'ExpressionAttributeValues': {
+      this.awsClient.update({
+        TableName: this.tableName,
+        Key: { userId },
+        UpdateExpression: 'SET walletInCents = walletInCents + :differenceInCents',
+        ConditionExpression: 'walletInCents >= :minimumWallet',
+        ExpressionAttributeValues: {
           ':differenceInCents': differenceInCents,
           ':minimumWallet': -1 * differenceInCents,
         },
-        'ReturnValues': 'UPDATED_NEW',
+        ReturnValues: 'UPDATED_NEW',
       }, (err, data) => {
-        if (err || !('wallet_in_cents' in data.Attributes)) {
+        if (err) {
+          console.error('Failed to update user wallet', userId, differenceInCents, err);
           return reject();
         }
-        return resolve(data.Attributes['wallet_in_cents']);
+        if ('walletInCents' in data.Attributes) {
+          return resolve(data.Attributes['walletInCents']);
+        }
+        return reject();
       })
     );
   }

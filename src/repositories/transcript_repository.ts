@@ -1,46 +1,46 @@
 import BaseRepository from './base_repository';
-import Transcript from '../interfaces/transcript';
+import { Transcript } from '../interfaces/transcript';
 
 export default class TranscriptRepository extends BaseRepository {
 
-  table_name = 'Transcripts';
+  tableName = 'Transcripts';
 
-  async get_transcripts_by_table_id(table_id: string): Promise<Array<Transcript>> {
-    return new Promise((resolve, _) => {
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'ProjectionExpression': 'table_id, body, added_at',
-        'KeyConditionExpression': 'table_id = :tid and added_at < :aat',
-        'ExpressionAttributeValues': {
-          ':tid': table_id,
-          ':aat': (new Date()).toISOString(),
+  async getTranscriptsByChannelId(channelId: string): Promise<Array<Transcript>> {
+    return new Promise((resolve, reject) => {
+      this.awsClient.query({
+        TableName: this.tableName,
+        ProjectionExpression: 'channelId, body, addedAt',
+        KeyConditionExpression: 'channelId = :channelId and addedAt < :addedAt',
+        ExpressionAttributeValues: {
+          ':channelId': channelId,
+          ':addedAt': (new Date()).toISOString(),
         }
       }, (err, data) => {
-        if (data && data.Items) {
-          return resolve(data.Items);
+        if (err) {
+          console.error('Could not get transcripts by channel id', channelId, err);
+          return resolve([]);
         }
-        console.error(`Could not find transcripts for table ${table_id}`, err, data);
-        return resolve([]);
+        return resolve(data.Items);
       });
     });
   }
 
-  async save_transcript(table_id: string, body: string): Promise<boolean> {
+  async saveTranscript(channelId: string, body: string): Promise<boolean> {
     const SECONDS_IN_AN_HOUR = 60 * 60;
-    const seconds_since_epoch = Math.round(Date.now() / 1000);
+    const secondsSinceEpoch = Math.round(Date.now() / 1000);
     const item = {
-      'table_id': table_id,
-      'body': body,
-      'added_at': (new Date()).toISOString(),
-      'expiring_at': seconds_since_epoch + SECONDS_IN_AN_HOUR
+      channelId,
+      body,
+      addedAt: (new Date()).toISOString(),
+      expiringAtSeconds: secondsSinceEpoch + SECONDS_IN_AN_HOUR
     };
-    return new Promise((resolve, _) => {
-      this.aws_client.put({
-        'TableName': this.table_name,
-        'Item': item,
+    return new Promise((resolve, reject) => {
+      this.awsClient.put({
+        TableName: this.tableName,
+        Item: item,
       }, (err, data) => {
         if (err) {
-          console.error('Failed to save transcript', table_id, err);
+          console.error('Failed to save transcript', channelId, err);
           return resolve(false);
         }
         return resolve(true);

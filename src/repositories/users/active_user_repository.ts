@@ -1,46 +1,42 @@
 import BaseRepository from '../base_repository';
-
-type ActiveUser = {
-  user_id: string,
-  last_active_at: string,
-};
+import { ActiveUser } from '../../interfaces/user';
 
 export default class ActiveUserRepository extends BaseRepository {
 
-  table_name = 'ActiveUsers';
+  tableName = 'ActiveUsers';
 
-  async get_active_users(): Promise<Array<ActiveUser>> {
+  async getActiveUsers(): Promise<Array<ActiveUser>> {
     return new Promise((resolve, reject) =>
-      this.aws_client.scan({
-        'TableName': this.table_name,
+      this.awsClient.scan({
+        TableName: this.tableName
       }, (err, data) => {
-        if (data && data.Items) {
-          return resolve(data.Items);
+        if (err) {
+          console.error(`Could not find active users`);
+          return resolve([]);
         }
-        console.error(`Could not find active users`)
-        return resolve([]);
+        return resolve(data.Items);
       })
     );
   }
 
-  async update_active_user(user_id: string): Promise<undefined> {
+  async updateActiveUser(userId: string): Promise<boolean> {
     const SECONDS_IN_A_MINUTE = 60;
-    const seconds_since_epoch = Math.round(Date.now() / 1000);
+    const secondsSinceEpoch = Math.round(Date.now() / 1000);
     const item = {
-      'user_id': user_id,
-      'last_active_at': (new Date()).toISOString(),
-      'expiring_at': seconds_since_epoch + (SECONDS_IN_A_MINUTE * 2) // TTL is 2 minutes for each record. User is no longer deemed "active" after this point
+      userId,
+      lastActiveAt: (new Date()).toISOString(),
+      expiringAtSeconds: secondsSinceEpoch + (SECONDS_IN_A_MINUTE * 2)
     };
     return new Promise((resolve, reject) =>
-      this.aws_client.put({
-        'TableName': this.table_name,
-        'Item': item
+      this.awsClient.put({
+        TableName: this.tableName,
+        Item: item
       }, (err, data) => {
         if (err) {
-          console.error('Failed to update active user', user_id, err);
-          return reject();
+          console.error('Failed to update active user', userId, err);
+          return resolve(false);
         }
-        return resolve();
+        return resolve(true);
       })
     );
   }

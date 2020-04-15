@@ -1,30 +1,30 @@
-import TableRepository from '../src/repositories/table_repository';
-import { DEFAULT_CONNECTION, DEFAULT_SHAPE, Connection, Shape } from '../src/enums/table';
+import ChannelRepository from '../src/repositories/channel_repository';
+import { VideoConnection, DEFAULT_VIDEO_CONNECTION, TableShape } from '../src/enums';
 
 async function populate() {
-  const tableRepository = new TableRepository();
-  await tableRepository.update_table(
+  const channelRepository = new ChannelRepository();
+  await channelRepository.updateChannel(
     'club1a',
     new Array(10).fill(null),
     'Table 1',
-    DEFAULT_CONNECTION,
-    Shape.UDown,
+    DEFAULT_VIDEO_CONNECTION,
+    TableShape.UDown,
   );
 
-  await tableRepository.update_table(
+  await channelRepository.updateChannel(
     'club1b',
     new Array(10).fill(null),
     'Table 2',
-    DEFAULT_CONNECTION,
-    Shape.UDown,
+    DEFAULT_VIDEO_CONNECTION,
+    TableShape.UDown,
   );
 
-  await tableRepository.update_table(
+  await channelRepository.updateChannel(
     'club2a',
     new Array(24).fill(null),
     'Dance Floor',
-    Connection.AudioOnly,
-    Shape.DanceFloor,
+    VideoConnection.AudioOnly,
+    TableShape.DanceFloor,
   );
 }
 
