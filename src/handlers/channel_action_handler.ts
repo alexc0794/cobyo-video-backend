@@ -44,10 +44,8 @@ async function sendMessage(event, context) {
     sentAt: (new Date()).toISOString(),
     message
   };
-  await broadcastToChannel(event, channelId, {
-    ...chatMessage,
-    action,
-  });
+  const payload = { ...chatMessage, action };
+  await broadcastToChannel(event, channelId, userId, payload);
 
   return Promise.resolve();
 }
@@ -68,13 +66,8 @@ async function purchasedMenuItem(event, context) {
     return Promise.reject();
   }
 
-  await broadcastToChannel(event, channelId, {
-    action,
-    itemId,
-    userId,
-    fromUserId,
-    menuItem,
-  });
+  const payload = { action, itemId, userId, fromUserId, menuItem };
+  await broadcastToChannel(event, channelId, userId, payload);
 
   return Promise.resolve();
 }

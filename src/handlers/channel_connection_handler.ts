@@ -22,24 +22,22 @@ export default async function channelConnectionHandler(event, context, callback)
     if (!await channelConnect(channelId, connectionId, userId)) {
       return callback(null, { statusCode: 500 });
     }
-    await broadcastToChannel(event, channelId, {
-      userId,
-      action: event.requestContext.eventType,
-    });
+    const payload = { userId, action: event.requestContext.eventType };
+    await broadcastToChannel(event, channelId, userId, payload);
   }
 
   // Handle DISCONNECT
   if (event.requestContext.eventType === "DISCONNECT") {
+    // Get the channel connection before it disconnects.
+    const channelConnection: ChannelConnection|null = await (new ChannelConnectionRepository()).getChannelByConnectionId(connectionId);
+    // Disconnect connection from channel
     if (!await channelDisconnect(connectionId)) {
       return callback(null, { statusCode: 500 });
     }
-    const channelConnection: ChannelConnection|null = await (new ChannelConnectionRepository()).getChannelByConnectionId(connectionId);
     if (channelConnection) {
       const { channelId, userId } = channelConnection;
-      await broadcastToChannel(event, channelId, {
-        userId,
-        action: event.requestContext.eventType,
-      });
+      const payload = { userId, action: event.requestContext.eventType };
+      await broadcastToChannel(event, channelId, userId, payload);
 
       // We also want to remove user id from table when they disconnect.
       // This is to handle the case where a user leaves the page without leaving the table.
