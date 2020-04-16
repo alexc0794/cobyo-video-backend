@@ -15,7 +15,7 @@ type StorefrontStatus = {
 
 export default class StorefrontRepository extends BaseRepository {
 
-  get_storefront_by_moment(moment): StorefrontStatus {
+  getStorefrontByMoment(moment): StorefrontStatus {
     return { storefront: Storefront.Club, status: Status.Open };
 
     const hour = parseInt(moment.format('H'), 10);
@@ -44,7 +44,7 @@ export default class StorefrontRepository extends BaseRepository {
     return { storefront: DEFAULT_STOREFRONT, status: Status.Open };
   }
 
-  get_storefront_table_id_grid(storefront: Storefront): Array<Array<string|null>> {
+  getStorefrontTableIdGrid(storefront: Storefront): Array<Array<string|null>> {
     switch (storefront) {
       case Storefront.Club:
         return [

@@ -1,34 +1,32 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import { Transcript } from '../interfaces/transcript';
 import TranscriptRepository from '../repositories/transcript_repository';
 
 export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.post('/transcript', async function(req, res) {
-    const table_id: string = req.body.table_id;
+  app.post('/transcript', async function(req: Request, res: Response) {
+    const channelId: string = req.body.channelId;
     const body: string = req.body.body;
-    const saved = await (new TranscriptRepository()).save_transcript(
-      table_id,
-      body
-    );
-    res.send(saved);
+    const saved: boolean = await (new TranscriptRepository()).saveTranscript(channelId, body);
+    return res.sendStatus(saved ? 200 : 500);
   });
 
   // Maybe authenticate?
-  app.get('/table/:table_id/keywords', async function(req, res) {
-    const table_id: string = req.params.table_id;
-    const min_frequency: number = req.query.min_frequency || 3;
-    const min_word_length: number = req.query.min_word_length || 5;
-    const transcripts = await (new TranscriptRepository()).get_transcripts_by_table_id(table_id);
+  app.get('/table/:channelId/keywords', async function(req: Request, res: Response) {
+    const channelId: string = req.params.channelId;
+    const minFrequency: number = req.query.minFrequency || 3;
+    const minWordLength: number = req.query.minWordLength || 5;
+    const transcripts: Array<Transcript> = await (new TranscriptRepository()).getTranscriptsByChannelId(channelId);
     const dictionary = {};
     // TODO: Optimize by using min-heap or trie
-    transcripts.forEach(transcript => {
+    transcripts.forEach((transcript: Transcript) => {
       const words = transcript.body.split(" ");
       for (let i = 0; i < words.length; i++) {
         const word = words[i]
-        if (word.length < min_word_length) { // Word must be min_word_length letters or more
+        if (word.length < minWordLength) { // Word must be minWordLength letters or more
           continue;
         }
         const letters = /^[A-Za-z-]+$/;
@@ -43,14 +41,14 @@ export default (app: Router) => {
       }
     });
 
-    const all_words = Object.keys(dictionary).map(word => [word, dictionary[word]]);
-    const filtered_words = all_words.filter(entry => entry[1] >= min_frequency);
-    filtered_words.sort(function(a, b) {
+    const allWords = Object.keys(dictionary).map(word => [word, dictionary[word]]);
+    const filteredWords = allWords.filter(entry => entry[1] >= minFrequency);
+    filteredWords.sort(function(a, b) {
       return b[1] - a[1];
     });
 
     const keywords = {};
-    filtered_words.slice(0, 10).forEach(entry => {
+    filteredWords.slice(0, 10).forEach(entry => {
       keywords[entry[0]] = entry[1];
     });
     res.send(keywords);

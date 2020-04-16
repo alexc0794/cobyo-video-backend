@@ -6,7 +6,7 @@ import MenuRepository from '../repositories/menu_repository';
 import ApiGatewayService from '../services/api_gateway_service';
 import { broadcastToChannel } from './channel_helpers';
 
-export default async function channel_action_handler(event, context, callback) {
+export default async function channelActionHandler(event, context, callback) {
   try {
     switch (event.requestContext.routeKey) {
       case 'sendMessage': {
@@ -39,9 +39,9 @@ async function sendMessage(event, context) {
   }
 
   const chatMessage: ChatMessage = {
-    message_id: uuid4(),
-    user_id: userId,
-    sent_at: (new Date()).toISOString(),
+    messageId: uuid4(),
+    userId: userId,
+    sentAt: (new Date()).toISOString(),
     message
   };
   await broadcastToChannel(event, channelId, {
@@ -63,7 +63,7 @@ async function purchasedMenuItem(event, context) {
     return Promise.reject();
   }
 
-  const menuItem = (new MenuRepository()).getMenuByItemId(itemId);
+  const menuItem = (new MenuRepository()).getMenuItemById(itemId);
   if (!menuItem) {
     return Promise.reject();
   }

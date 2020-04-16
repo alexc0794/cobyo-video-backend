@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import short from 'short-uuid';
 import channelConnectionHandler from './src/handlers/channel_connection_handler';
-import channel_action_handler from './src/handlers/channel_action_handler';
+import channelActionHandler from './src/handlers/channel_action_handler';
 import { IS_DEV, WS_PORT } from './config';
 
 // if (IS_DEV) {
@@ -71,5 +71,5 @@ import { IS_DEV, WS_PORT } from './config';
 
 
 module.exports.connectionHandler = channelConnectionHandler;
-module.exports.defaultHandler = channel_action_handler;
-module.exports.channelActionHandler = channel_action_handler;
+module.exports.defaultHandler = channelActionHandler;
+module.exports.channelActionHandler = channelActionHandler;

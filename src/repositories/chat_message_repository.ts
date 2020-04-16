@@ -3,21 +3,21 @@ import BaseRepository from './base_repository';
 
 export default class ChatMessageRepository extends BaseRepository {
 
-  table_name = 'ChatMessages';
+  tableName = 'ChatMessages';
 
-  create_message(chat_message: ChatMessage): Promise<boolean> {
+  createMessage(chatMessage: ChatMessage): Promise<boolean> {
     const SECONDS_IN_AN_HOUR = 60 * 60;
-    const seconds_since_epoch = Math.round(Date.now() / 1000);
+    const secondsSinceEpoch = Math.round(Date.now() / 1000);
     return new Promise((resolve, reject) =>
-      this.aws_client.put({
-        'TableName': this.table_name,
-        'Item': {
-          ...chat_message,
-          'expiring_at': seconds_since_epoch + SECONDS_IN_AN_HOUR // Expire a chat message after an hour
+      this.awsClient.put({
+        TableName: this.tableName,
+        Item: {
+          ...chatMessage,
+          expiringAt: secondsSinceEpoch + SECONDS_IN_AN_HOUR // Expire a chat message after an hour
         }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to create message', chat_message, err);
+          console.error('Failed to create message', chatMessage, err);
           return resolve(false);
         }
         return resolve(true);
@@ -25,42 +25,39 @@ export default class ChatMessageRepository extends BaseRepository {
     );
   }
 
-  get_message(message_id: string): Promise<ChatMessage> {
+  getMessage(messageId: string): Promise<ChatMessage> {
     return new Promise((resolve, reject) =>
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'KeyConditionExpression': 'message_id = :message_id',
-        'ExpressionAttributeValues': {
-          ':message_id': message_id,
+      this.awsClient.query({
+        TableName: this.tableName,
+        KeyConditionExpression: 'messageId = :messageId',
+        ExpressionAttributeValues: {
+          ':messageId': messageId,
         },
       }, (err, data) => {
         if (err) {
-          console.error(err);
+          console.error('Could not get message', messageId, err);
           return reject();
         }
-        if (!data.Items || data.Items.length === 0) {
-          console.error('No message found', message_id);
+        if (data.Items.length === 0) {
+          console.error('No message found', messageId);
           return reject();
         }
-
         return resolve(data.Items[0]);
       })
     );
   }
 
-  get_messages(before_sent_at: string, limit: number): Promise<Array<ChatMessage>> {
+  getMessages(beforeSentAt: string, limit: number): Promise<Array<ChatMessage>> {
     return new Promise((resolve, reject) =>
-      this.aws_client.query({
-        'TableName': this.table_name,
-        'Limit': limit,
-        'KeyConditionExpression': 'sent_at < :before_sent_at',
-        'ExpressionAttributeValues': {
-          ':before_sent_at': before_sent_at,
-        }
+      this.awsClient.query({
+        TableName: this.tableName,
+        Limit: limit,
+        KeyConditionExpression: 'sentAt < :beforeSentAt',
+        ExpressionAttributeValues: { ':beforeSentAt': beforeSentAt }
       }, (err, data) => {
         if (err) {
-          console.error('Failed to get messages', limit, before_sent_at);
-          return resolve([]);
+          console.error('Failed to get messages', limit, beforeSentAt);
+          return reject([])
         }
         return resolve(data.Items);
       })

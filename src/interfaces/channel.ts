@@ -1,7 +1,23 @@
+import { VideoConnection, TableShape } from '../enums';
+
+export interface Seat {
+  seatNumber: number,
+  userId: string,
+  satDownAt: string,
+};
 
 export interface ChannelConnection {
-  channel_id: string,
-  connection_id: string,
-  user_id: string,
-  connected_at: string,
+  channelId: string,
+  connectionId: string,
+  userId: string,
+  connectedAt: string,
+};
+
+export interface Channel {
+  channelId: string,
+  channelName: string,
+  lastUpdatedAt: string,
+  videoConnection: VideoConnection,
+  tableShape: TableShape,
+  seats: Array<Seat|null>,
 };

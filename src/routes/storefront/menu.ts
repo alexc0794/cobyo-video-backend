@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { feature_overrides, authenticate } from '../middleware';
+import { featureOverrides, authenticate } from '../middleware';
 import { Storefront } from '../../enums/storefront';
 import { Menu, MenuItem } from '../../interfaces/menu';
 import { InventoryItem } from '../../interfaces/user';
@@ -12,7 +12,11 @@ export default (app: Router) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/menu/:storefront', function(req, res) {
+  type GetMenuResponse = {
+    menu: Menu,
+  };
+
+  app.get('/menu/:storefront', function(req: Request, res: Response) {
     let storefront: Storefront;
     switch (req.params.storefront.toUpperCase()) {
       case 'CLUB': {
@@ -30,19 +34,26 @@ export default (app: Router) => {
       default:
         storefront = Storefront.Cafeteria;
     }
-    const menu_repository = new MenuRepository();
-    const menu: Menu = menu_repository.get_menu_by_storefront(storefront);
+    const menuRepository = new MenuRepository();
+    const menu: Menu = menuRepository.getMenuByStorefront(storefront);
 
-    res.send({
-      menu,
-    });
+    const response: GetMenuResponse = { menu };
+    res.send(response);
   });
 
-  app.post('/menu/purchase', authenticate, async function (req: any, res) {
-    const fromUserId: string = req.user.user_id;
+  type PurchaseFromMenuResponse = {
+    updatedWalletInCents: number,
+    inventoryItem: InventoryItem,
+    toUserIds: Array<string>,
+  };
+
+  // TODO: Authenticate instead of pass fromUserId from body
+  app.post('/menu/purchase', async function (req: any, res) {
+    const fromUserId: string = req.body.fromUserId;
     const itemId: string = req.body.itemId;
     const toUserId: string = req.body.toUserId || fromUserId;
-    const menuItem: MenuItem|null = (new MenuRepository()).getMenuByItemId(itemId)
+    const toUserIds: Array<string> = [toUserId]; // TODO: Implement purchase for multiple ppl
+    const menuItem: MenuItem|null = (new MenuRepository()).getMenuItemById(itemId)
     if (!menuItem) {
       return res.sendStatus(500);
     }
@@ -74,9 +85,7 @@ export default (app: Router) => {
       return res.status(400).send({ updatedWalletInCents, inventoryItem: null });
     }
 
-    return res.send({
-      updatedWalletInCents,
-      inventoryItem,
-    });
+    const response: PurchaseFromMenuResponse = { updatedWalletInCents, inventoryItem, toUserIds };
+    return res.send(response);
   });
 }

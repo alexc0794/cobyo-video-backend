@@ -1,18 +1,10 @@
+import { TABLES_WITH_TTL } from './shared';
 import { AWS_CONFIG } from '../config';
 
 const AWS = require('aws-sdk');
 AWS.config.update(AWS_CONFIG);
 
 const dynamodb = new AWS.DynamoDB();
-
-const TABLES_WITH_TTL = [
-  'ActiveUsers',
-  'ChannelConnections',
-  'ChatConnections',
-  'ChatMessages',
-  'Transcripts',
-  'UserInventory',
-];
 
 function createTable(params: any): void {
   dynamodb.createTable(params, (err, data) => {
@@ -31,8 +23,8 @@ function updateTTL(tableName: string): void {
   dynamodb.updateTimeToLive({
     TableName: tableName,
     TimeToLiveSpecification: {
-      AttributeName: 'expiring_at',
-      Enabled: true
+      AttributeName: 'expiringAtSeconds',
+      Enabled: true,
     }
   }, (err, data) => {
     if (err) {
@@ -44,84 +36,61 @@ function updateTTL(tableName: string): void {
 }
 
 createTable({
-  TableName: 'Tables',
+  TableName: 'Channels',
   KeySchema: [
-    { AttributeName: 'table_id', KeyType: 'HASH' }
+    { AttributeName: 'channelId', KeyType: 'HASH' }
   ],
   AttributeDefinitions: [
-    { AttributeName: 'table_id', AttributeType: 'S' },
+    { AttributeName: 'channelId', AttributeType: 'S' },
   ],
   ProvisionedThroughput: {
-    ReadCapacityUnits: 10,
-    WriteCapacityUnits: 10
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
   }
 });
 
 createTable({
   TableName: 'Transcripts',
   KeySchema: [
-    { AttributeName: 'table_id', KeyType: 'HASH' },
-    { AttributeName: 'added_at', KeyType: 'RANGE' }
+    { AttributeName: 'channelId', KeyType: 'HASH' },
+    { AttributeName: 'addedAt', KeyType: 'RANGE' }
   ],
   AttributeDefinitions: [
-    { AttributeName: 'table_id', AttributeType: 'S' },
-    { AttributeName: 'added_at', AttributeType: 'S' }
+    { AttributeName: 'channelId', AttributeType: 'S' },
+    { AttributeName: 'addedAt', AttributeType: 'S' }
   ],
   ProvisionedThroughput: {
-    ReadCapacityUnits: 10,
-    WriteCapacityUnits: 10
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
   },
 });
 
 createTable({
   TableName: 'Users',
-  KeySchema: [
-    { AttributeName: 'user_id', KeyType: 'HASH' }
-  ],
+  KeySchema: [{ AttributeName: 'userId', KeyType: 'HASH' }],
   AttributeDefinitions: [
-    { AttributeName: 'user_id', AttributeType: 'S' },
-    { AttributeName: 'facebook_user_id', AttributeType: 'S' },
+    { AttributeName: 'userId', AttributeType: 'S' },
+    { AttributeName: 'facebookUserId', AttributeType: 'S' },
   ],
   ProvisionedThroughput: {
-    ReadCapacityUnits: 10,
-    WriteCapacityUnits: 10
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
   },
   GlobalSecondaryIndexes: [{
-     // We want to check if a user has already logged in with their Facebook account before creating a new user account
     IndexName: 'FacebookUserIndex',
-    KeySchema: [
-      { AttributeName: 'facebook_user_id', KeyType: 'HASH' }
-    ],
-    Projection: { ProjectionType: 'KEYS_ONLY' }, // Should return user_id and facebook_user_id
+    KeySchema: [{ AttributeName: 'facebookUserId', KeyType: 'HASH' }],
+    Projection: { ProjectionType: 'KEYS_ONLY' },
     ProvisionedThroughput: {
-        ReadCapacityUnits: 5,
-        WriteCapacityUnits: 5
+      ReadCapacityUnits: 2,
+      WriteCapacityUnits: 2,
     }
   }]
 });
 
 createTable({
   TableName: 'ActiveUsers',
-  KeySchema: [
-    { AttributeName: 'user_id', KeyType: 'HASH' },
-  ],
-  AttributeDefinitions: [
-    { AttributeName: 'user_id', AttributeType: 'S' },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 5,
-    WriteCapacityUnits: 5
-  },
-});
-
-createTable({
-  TableName: 'ChatConnections',
-  KeySchema: [
-    { AttributeName: 'connection_id', KeyType: 'HASH' },
-  ],
-  AttributeDefinitions: [
-    { AttributeName: 'connection_id', AttributeType: 'S' },
-  ],
+  KeySchema: [{ AttributeName: 'userId', KeyType: 'HASH' }],
+  AttributeDefinitions: [{ AttributeName: 'userId', AttributeType: 'S' }],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
     WriteCapacityUnits: 5
@@ -131,12 +100,12 @@ createTable({
 createTable({
   TableName: 'ChatMessages',
   KeySchema: [
-    { AttributeName: 'message_id', KeyType: 'HASH' },
-    { AttributeName: 'sent_at', KeyType: 'RANGE' }
+    { AttributeName: 'messageId', KeyType: 'HASH' },
+    { AttributeName: 'sentAt', KeyType: 'RANGE' }
   ],
   AttributeDefinitions: [
-    { AttributeName: 'message_id', AttributeType: 'S' },
-    { AttributeName: 'sent_at', AttributeType: 'S' }
+    { AttributeName: 'messageId', AttributeType: 'S' },
+    { AttributeName: 'sentAt', AttributeType: 'S' }
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -147,27 +116,24 @@ createTable({
 createTable({
   TableName: 'ChannelConnections',
   KeySchema: [
-    { AttributeName: 'channel_id', KeyType: 'HASH' },
-    { AttributeName: 'connection_id', KeyType: 'RANGE' },
+    { AttributeName: 'channelId', KeyType: 'HASH' },
+    { AttributeName: 'connectionId', KeyType: 'RANGE' },
   ],
   AttributeDefinitions: [
-    { AttributeName: 'channel_id', AttributeType: 'S' },
-    { AttributeName: 'connection_id', AttributeType: 'S' },
+    { AttributeName: 'channelId', AttributeType: 'S' },
+    { AttributeName: 'connectionId', AttributeType: 'S' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
     WriteCapacityUnits: 5
   },
   GlobalSecondaryIndexes: [{
-     // We want to check if a user has already logged in with their Facebook account before creating a new user account
     IndexName: 'ConnectionChannelIndex',
-    KeySchema: [
-      { AttributeName: 'connection_id', KeyType: 'HASH' }
-    ],
+    KeySchema: [{ AttributeName: 'connectionId', KeyType: 'HASH' }],
     Projection: { ProjectionType: 'ALL' },
     ProvisionedThroughput: {
-        ReadCapacityUnits: 5,
-        WriteCapacityUnits: 5
+      ReadCapacityUnits: 2,
+      WriteCapacityUnits: 2
     }
   }]
 });

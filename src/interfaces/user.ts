@@ -1,11 +1,11 @@
-export default interface User {
-  user_id: string,
-  facebook_user_id: string|null,
+export interface User {
+  userId: string,
+  facebookUserId: string|null,
   email: string|null,
-  first_name: string,
-  last_name: string|null,
-  profile_picture_url: string|null,
-  wallet_in_cents: number,
+  firstName: string,
+  lastName: string|null,
+  profilePictureUrl: string|null,
+  walletInCents: number,
 };
 
 export interface InventoryItem {
@@ -15,4 +15,9 @@ export interface InventoryItem {
   purchasedAt: string,
   itemIdPurchasedAt: string,
   expiringAtSeconds: number,
+};
+
+export type ActiveUser = {
+  userId: string,
+  lastActiveAt: string,
 };
