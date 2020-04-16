@@ -1,5 +1,4 @@
 export const TABLE_NAMES = [
-  'ActiveUsers',
   'ChannelConnections',
   'ChatMessages',
   'Channels',
@@ -9,7 +8,6 @@ export const TABLE_NAMES = [
 ];
 
 export const TABLES_WITH_TTL = [
-  'ActiveUsers',
   'ChannelConnections',
   'ChatMessages',
   'Transcripts',

@@ -15,7 +15,7 @@ provider:
       - dynamodb:BatchGetItem
       - dynamodb:PutItem
       - dynamodb:UpdateItem
-    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Tables"
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Channels"
   - Effect: "Allow"
     Action:
       - dynamodb:Query
@@ -35,14 +35,6 @@ provider:
     Action:
       - dynamodb:Query
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Users/index/FacebookUserIndex"
-  - Effect: "Allow"
-    Action:
-      - dynamodb:Query
-      - dynamodb:Scan
-      - dynamodb:GetItem
-      - dynamodb:PutItem
-      - dynamodb:UpdateItem
-    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ActiveUsers"
   - Effect: "Allow"
     Action:
       - dynamodb:Scan
