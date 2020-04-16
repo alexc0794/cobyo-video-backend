@@ -45,7 +45,7 @@ async function sendMessage(event, context) {
     message
   };
   const payload = { ...chatMessage, action };
-  await broadcastToChannel(event, channelId, userId, payload);
+  await broadcastToChannel(event, channelId, payload);
 
   return Promise.resolve();
 }
@@ -67,7 +67,7 @@ async function purchasedMenuItem(event, context) {
   }
 
   const payload = { action, itemId, userId, fromUserId, menuItem };
-  await broadcastToChannel(event, channelId, userId, payload);
+  await broadcastToChannel(event, channelId, payload);
 
   return Promise.resolve();
 }

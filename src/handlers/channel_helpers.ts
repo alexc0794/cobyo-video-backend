@@ -5,8 +5,8 @@ import ApiGatewayService from '../services/api_gateway_service';
 export async function broadcastToChannel(
   event: any,
   channelId: string,
-  userId: string,
   payload: any,
+  userId: string|null = null, // Passing this in means you dont want to send to yourself
 ): Promise<Array<ChannelConnection>> {
   const channelConnectionRepository = new ChannelConnectionRepository();
   const connections: Array<ChannelConnection> = await channelConnectionRepository.getChannelConnections(channelId);
