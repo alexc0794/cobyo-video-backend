@@ -34,6 +34,12 @@ provider:
   - Effect: "Allow"
     Action:
       - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/UserInventory"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:Query
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/Users/index/FacebookUserIndex"
   - Effect: "Allow"
     Action:
