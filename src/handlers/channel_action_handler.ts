@@ -77,23 +77,17 @@ async function purchasedMenuItem(event, context) {
 }
 
 async function changeSong(event, context) {
-  console.log('changeSong', event.body);
   const body = JSON.parse(event.body);
+  console.log('CHANGE_SONG', body);
   const action = body.action;
-  const {
-    userId,
-    channelId,
-    trackId,
-    trackUri,
-    trackName
-  } = body;
-  if (!channelId || !userId) {
+  const { channelId, fromUserId } = body;
+  if (!channelId || !fromUserId) {
     return Promise.reject();
   }
 
   // TODO: save song to database
 
-  const payload = { action, trackId, trackUri, trackName };
+  const payload = { action, ...body };
   await broadcastToChannel(event, channelId, payload);
 
   return Promise.resolve();
