@@ -97,3 +97,5 @@ functions:
           route: sendMessage
       - websocket:
           route: purchasedMenuItem
+      - websocket:
+          route: CHANGE_SONG

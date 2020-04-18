@@ -17,6 +17,10 @@ export default async function channelActionHandler(event, context, callback) {
         await purchasedMenuItem(event, context);
         break;
       }
+      case 'CHANGE_SONG': {
+        await changeSong(event, context);
+        break;
+      }
       default: {
         return callback(null, { statusCode: 404 });
       }
@@ -67,6 +71,29 @@ async function purchasedMenuItem(event, context) {
   }
 
   const payload = { action, itemId, userId, fromUserId, menuItem };
+  await broadcastToChannel(event, channelId, payload);
+
+  return Promise.resolve();
+}
+
+async function changeSong(event, context) {
+  console.log('changeSong', event.body);
+  const body = JSON.parse(event.body);
+  const action = body.action;
+  const {
+    userId,
+    channelId,
+    trackId,
+    trackUri,
+    trackName
+  } = body;
+  if (!channelId || !userId) {
+    return Promise.reject();
+  }
+
+  // TODO: save song to database
+
+  const payload = { action, trackId, trackUri, trackName };
   await broadcastToChannel(event, channelId, payload);
 
   return Promise.resolve();
