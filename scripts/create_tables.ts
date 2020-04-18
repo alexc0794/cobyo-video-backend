@@ -167,3 +167,17 @@ createTable({
     WriteCapacityUnits: 5,
   }
 });
+
+createTable({
+  TableName: 'CurrentlyPlaying',
+  KeySchema: [
+    { AttributeName: 'channelId', KeyType: 'HASH' }
+  ],
+  AttributeDefinitions: [
+    { AttributeName: 'channelId', AttributeType: 'S' },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
+  }
+});

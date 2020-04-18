@@ -3,9 +3,10 @@ import bodyParser from 'body-parser';
 import { softAuthenticate } from './middleware';
 import { IS_DEV } from '../../config';
 import { VideoConnection, TableShape, DEFAULT_VIDEO_CONNECTION, DEFAULT_TABLE_SHAPE } from '../enums';
-import { Channel, ChannelConnection, User, Seat } from '../interfaces';
+import { Channel, ChannelConnection, User, Seat, CurrentlyPlaying } from '../interfaces';
 import ChannelRepository from '../repositories/channel_repository';
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
+import CurrentlyPlayingRepository from '../repositories/currently_playing_repository';
 import UserRepository from '../repositories/users/user_repository';
 import ActiveUserRepository from '../repositories/users/active_user_repository';
 
@@ -22,7 +23,7 @@ export default (app: Router) => {
 
   app.get('/channel/:channelId', softAuthenticate, async function(req: Request, res: Response) {
     const channelId = req.params.channelId;
-    const channel: Channel|null = await (new ChannelRepository()).getChannelById(channelId);
+    const channel: Channel | null = await (new ChannelRepository()).getChannelById(channelId);
     if (!channel) {
       return res.status(500).send({ error: `Failed to find channel ${channelId}` });
     }
@@ -54,14 +55,14 @@ export default (app: Router) => {
     channel: Channel,
   };
 
-  app.put('/channel', async function (req: Request, res: Response) {
+  app.put('/channel', async function(req: Request, res: Response) {
     const channelId = req.body.channelId
     const name = req.body.name
     try {
       const channel: Channel = await (new ChannelRepository()).updateChannelName(channelId, name);
       const response: UpdateChannelResponse = { channel };
       return res.send(response);
-    } catch(e) {
+    } catch (e) {
       return res.sendStatus(500)
     }
   });
@@ -72,7 +73,7 @@ export default (app: Router) => {
 
   app.post('/channel', async function(req: Request, res: Response) {
     const channelId: string = req.body.channelId;
-    const seats: Array<Seat|null> = req.body.seats;
+    const seats: Array<Seat | null> = req.body.seats;
     if (!channelId || !seats) {
       return res.sendStatus(400);
     }
@@ -98,7 +99,7 @@ export default (app: Router) => {
 
   type LeaveChannelResponse = Channel;
 
-  app.post('/channel/leave', async function (req: Request, res: Response) {
+  app.post('/channel/leave', async function(req: Request, res: Response) {
     const channelId = req.body.channelId;
     const userId = req.body.userId;
     if (!channelId || !userId) {
@@ -121,12 +122,12 @@ export default (app: Router) => {
   app.post('/channel/join', async function(req: Request, res: Response) {
     const channelId = req.body.channelId;
     const userId = req.body.userId;
-    const channel: Channel|null = await (new ChannelRepository()).getChannelById(channelId);
+    const channel: Channel | null = await (new ChannelRepository()).getChannelById(channelId);
     if (!channel) {
       return res.status(500).send({ error: `Failed to find channel ${channelId}` });
     }
 
-    let seats: Array<Seat|null> = channel.seats;
+    let seats: Array<Seat | null> = channel.seats;
     let seatNumber = parseInt(req.body.seatNumber, 10);
     if (isNaN(seatNumber)) {
       const openSeatNumbers = seats.map((seat, i) => seat ? -1 : i).filter(i => i != -1);
@@ -137,7 +138,7 @@ export default (app: Router) => {
       return res.status(400).send({ error: `Invalid seat number ${seatNumber}` });
     }
 
-    const seat: Seat|null = seats[seatNumber];
+    const seat: Seat | null = seats[seatNumber];
     if (seat != null && seat.userId !== userId) {
       return res.status(400).send({ error: `Different user ${seat.userId} is sitting there ${seatNumber}` });
     }
@@ -168,6 +169,22 @@ export default (app: Router) => {
 
     const response: JoinTableResponse = { channel: updatedChannel };
     res.send(response);
+  });
+
+
+  type GetCurrentlyPlayingResponse = {
+    currentlyPlaying: CurrentlyPlaying,
+  };
+
+  app.get('/channel/:channelId/currently-playing', async function(req: Request, res: Response) {
+    const channelId = req.params.channelId;
+    try {
+      const currentlyPlaying: CurrentlyPlaying = await (new CurrentlyPlayingRepository()).getChannelCurrentlyPlaying(channelId);
+      const response: GetCurrentlyPlayingResponse = { currentlyPlaying };
+      return res.send(response);
+    } catch {
+      return res.sendStatus(404);
+    }
   });
 
 }

@@ -1,8 +1,8 @@
 import uuid4 from 'uuid4';
-import { ChannelConnection } from '../interfaces/channel';
-import { ChatMessage } from '../interfaces/chat';
+import { ChannelConnection, ChatMessage, CurrentlyPlaying } from '../interfaces';
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
 import MenuRepository from '../repositories/menu_repository';
+import CurrentlyPlayingRepository from '../repositories/currently_playing_repository';
 import ApiGatewayService from '../services/api_gateway_service';
 import { broadcastToChannel } from './channel_helpers';
 
@@ -78,14 +78,28 @@ async function purchasedMenuItem(event, context) {
 
 async function changeSong(event, context) {
   const body = JSON.parse(event.body);
-  console.log('CHANGE_SONG', body);
   const action = body.action;
   const { channelId, fromUserId } = body;
   if (!channelId || !fromUserId) {
     return Promise.reject();
   }
 
-  // TODO: save song to database
+  const currentlyPlaying: CurrentlyPlaying = {
+    channelId,
+    fromUserId,
+    trackId: body.trackId,
+    trackUri: body.trackUri,
+    trackName: body.trackName,
+    artistName: body.artistName,
+    position: body.position,
+    duration: body.duration,
+    paused: body.paused,
+    updatedAtMs: Math.round(Date.now() / 1000),
+  };
+  const didUpdate: boolean = await (new CurrentlyPlayingRepository()).updateChannelCurrentlyPlaying(currentlyPlaying);
+  if (!didUpdate) {
+    console.error('Failed to update currently playing song', channelId);
+  }
 
   const payload = { action, ...body };
   await broadcastToChannel(event, channelId, payload);
