@@ -13,7 +13,7 @@ export default class ChatMessageRepository extends BaseRepository {
         TableName: this.tableName,
         Item: {
           ...chatMessage,
-          expiringAtMs: secondsSinceEpoch + SECONDS_IN_AN_HOUR // Expire a chat message after an hour
+          expiringAtSeconds: secondsSinceEpoch + SECONDS_IN_AN_HOUR // Expire a chat message after an hour
         }
       }, (err, data) => {
         if (err) {

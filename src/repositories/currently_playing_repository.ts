@@ -12,7 +12,7 @@ export default class ChatMessageRepository extends BaseRepository {
         TableName: this.tableName,
         Item: {
           ...currentlyPlaying,
-          expiringAtMs: currentlyPlaying.updatedAtMs + SECONDS_IN_TEN_MINUTES // Expire the currently playing song after 10 minutes (songs dont usually go longer than that?)
+          expiringAtSeconds: currentlyPlaying.updatedAtMs + SECONDS_IN_TEN_MINUTES // Expire the currently playing song after 10 minutes (songs dont usually go longer than that?)
         }
       }, (err, data) => {
         if (err) {
