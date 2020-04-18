@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { authenticate } from '../middleware';
 import { InventoryItem } from '../../interfaces';
 import UserInventoryRepository from '../../repositories/users/user_inventory_repository';
 
@@ -12,8 +11,8 @@ export default (app: Router) => {
     inventoryItems: Array<InventoryItem>,
   };
 
-  app.get('/user-inventory', authenticate, async function(req: any, res) {
-    const userId: string = req.user.userId;
+  app.get('/users/:userId/inventory', async function(req: any, res) {
+    const userId: string = req.params.userId;
     try {
       const inventoryItems: Array<InventoryItem> = await (new UserInventoryRepository()).getInventoryByUserId(userId);
       const response: GetUserInventory = { inventoryItems };
