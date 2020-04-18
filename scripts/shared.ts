@@ -2,6 +2,7 @@ export const TABLE_NAMES = [
   'ChannelConnections',
   'ChatMessages',
   'Channels',
+  'SpotifyTokens',
   'Transcripts',
   'Users',
   'UserInventory',
@@ -10,6 +11,7 @@ export const TABLE_NAMES = [
 export const TABLES_WITH_TTL = [
   'ChannelConnections',
   'ChatMessages',
+  'SpotifyTokens',
   'Transcripts',
   'UserInventory',
 ];

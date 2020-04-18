@@ -153,3 +153,17 @@ createTable({
     WriteCapacityUnits: 5
   },
 });
+
+createTable({
+  TableName: 'SpotifyTokens',
+  KeySchema: [
+    { AttributeName: 'user_id', KeyType: 'HASH' }
+  ],
+  AttributeDefinitions: [
+    { AttributeName: 'user_id', AttributeType: 'S' },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
+  }
+});

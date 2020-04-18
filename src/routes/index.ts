@@ -7,6 +7,7 @@ import activeUser from './users/active_user';
 import user from './users/user';
 import userInventory from './users/user_inventory';
 import menu from './storefront/menu';
+import spotify from './spotify';
 import storefront from './storefront/storefront';
 import transcript from './transcript';
 
@@ -34,6 +35,7 @@ export default (app: express.Application) => {
   channel(router);
   chat(router);
   menu(router);
+  spotify(router);
   storefront(router);
   transcript(router);
   user(router);

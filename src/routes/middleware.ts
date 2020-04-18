@@ -10,6 +10,7 @@ export function authenticate(req, res, next) {
         return res.sendStatus(403);
       }
       req.user = user;
+      req.token = token;
       next();
     });
   } else {
@@ -24,6 +25,7 @@ export function softAuthenticate(req, res, next) {
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
       if (!err) {
         req.user = user;
+        req.token = token;
       }
       return next();
     });

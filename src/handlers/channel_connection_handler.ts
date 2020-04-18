@@ -10,7 +10,7 @@ export default async function channelConnectionHandler(event, context, callback)
   if (event.requestContext.eventType === "CONNECT") {
     let channelId, userId;
     if (event.queryStringParameters && event.queryStringParameters.channelIdUserId) {
-      const [ _channelId, _userId ] = event.queryStringParameters.channelIdUserId.split(',');
+      const [_channelId, _userId] = event.queryStringParameters.channelIdUserId.split(',');
       channelId = _channelId;
       userId = _userId;
     } else if (event.queryStringParameters && event.queryStringParameters.userId) {
@@ -29,7 +29,7 @@ export default async function channelConnectionHandler(event, context, callback)
   // Handle DISCONNECT
   if (event.requestContext.eventType === "DISCONNECT") {
     // Get the channel connection before it disconnects.
-    const channelConnection: ChannelConnection|null = await (new ChannelConnectionRepository()).getChannelByConnectionId(connectionId);
+    const channelConnection: ChannelConnection | null = await (new ChannelConnectionRepository()).getChannelByConnectionId(connectionId);
     // Disconnect connection from channel
     if (!await channelDisconnect(connectionId)) {
       return callback(null, { statusCode: 500 });
@@ -42,7 +42,6 @@ export default async function channelConnectionHandler(event, context, callback)
       // We also want to remove user id from table when they disconnect.
       // This is to handle the case where a user leaves the page without leaving the table.
       const channel: Channel = await (new ChannelRepository()).leaveChannel(channelId, userId);
-      console.log('User disconnected from channel', channel);
     } else {
       console.warn('Couldnt find channel connection to broadcast user disconnected', connectionId);
     }
@@ -62,7 +61,7 @@ export async function channelConnect(channelId: string, connectionId: string, us
 export async function channelDisconnect(connectionId: string): Promise<boolean> {
   try {
     const channelConnectionRepository = new ChannelConnectionRepository();
-    const channelConnection: ChannelConnection|null = await channelConnectionRepository.getChannelByConnectionId(connectionId);
+    const channelConnection: ChannelConnection | null = await channelConnectionRepository.getChannelByConnectionId(connectionId);
     if (!channelConnection) {
       return false;
     }
