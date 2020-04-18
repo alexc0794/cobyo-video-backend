@@ -67,6 +67,11 @@ provider:
     Action:
       - dynamodb:Query
     Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/ChannelConnections/index/ConnectionChannelIndex"
+  - Effect: "Allow"
+    Action:
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+    Resource: "arn:aws:dynamodb:us-east-1:213475654097:table/SpotifyTokens"
 
 functions:
   app:

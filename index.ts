@@ -20,15 +20,15 @@ if (IS_DEV) {
     key: fs.readFileSync('server.key'),
     cert: fs.readFileSync('server.cert')
   },
-  app).listen(EXPRESS_PORT, () => {
-    console.log('List of available endpoints:');
-    console.log();
-    console.log(`https://localhost:${EXPRESS_PORT}/storefront`);
-    console.log(`https://localhost:${EXPRESS_PORT}/token/1`);
-    console.log(`https://localhost:${EXPRESS_PORT}/table/1`);
-    console.log(`https://localhost:${EXPRESS_PORT}/table/1/keywords`);
-    console.log(`https://localhost:${EXPRESS_PORT}/chat/messages`);
-  });
+    app).listen(EXPRESS_PORT, () => {
+      console.log('List of available endpoints:');
+      console.log();
+      console.log(`https://localhost:${EXPRESS_PORT}/spotify/authorize`);
+      console.log(`https://localhost:${EXPRESS_PORT}/storefront`);
+      console.log(`https://localhost:${EXPRESS_PORT}/storefront/menu`);
+      console.log(`https://localhost:${EXPRESS_PORT}/table/club1a`);
+      console.log(`https://localhost:${EXPRESS_PORT}/token/1`);
+    });
 }
 
 
