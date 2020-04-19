@@ -88,16 +88,6 @@ createTable({
 });
 
 createTable({
-  TableName: 'ActiveUsers',
-  KeySchema: [{ AttributeName: 'userId', KeyType: 'HASH' }],
-  AttributeDefinitions: [{ AttributeName: 'userId', AttributeType: 'S' }],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 5,
-    WriteCapacityUnits: 5
-  },
-});
-
-createTable({
   TableName: 'ChatMessages',
   KeySchema: [
     { AttributeName: 'messageId', KeyType: 'HASH' },

@@ -1,5 +1,6 @@
+import { IS_DEV } from '../../config';
 import BaseRepository from './base_repository';
-import { Storefront, Status, DEFAULT_STOREFRONT} from '../enums/storefront';
+import { Storefront, Status, DEFAULT_STOREFRONT } from '../enums/storefront';
 
 const CAFETERIA_OPEN_HOUR = 11;
 const CAFETERIA_CLOSED_HOUR = 14;
@@ -44,14 +45,18 @@ export default class StorefrontRepository extends BaseRepository {
     return { storefront: DEFAULT_STOREFRONT, status: Status.Open };
   }
 
-  getStorefrontTableIdGrid(storefront: Storefront): Array<Array<string|null>> {
+  getStorefrontTableIdGrid(storefront: Storefront): Array<Array<string>> {
     switch (storefront) {
       case Storefront.Club:
-        return [
-          ['club1a', 'club1b'],
-          ['club2a', 'club2b', 'club2c'],
-          ['club3a', 'club3b']
-        ];
+        return IS_DEV ? [
+          ['devclub1a', 'devclub1b'],
+          ['devclub2a', 'devclub2b', 'devclub2c'],
+          ['devclub3a', 'devclub3b']
+        ] : [
+            ['club1a', 'club1b'],
+            ['club2a', 'club2b', 'club2c'],
+            ['club3a', 'club3b']
+          ];
       default:
         return [
           ['1a', '1b'],
