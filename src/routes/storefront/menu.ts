@@ -71,7 +71,8 @@ export default (app: Router) => {
     }
 
     const sentToUserIds: Array<string> = [];
-    toUserIds.forEach(async (toUserId: string) => {
+    for (let i = 0; i < toUserIds.length; i++) {
+      const toUserId = toUserIds[i];
       try {
         await (new UserInventoryRepository()).addItemToInventory(
           toUserId,
@@ -84,8 +85,7 @@ export default (app: Router) => {
         // Add money back to user
         updatedWalletInCents = await (new UserRepository()).updateUserWallet(fromUserId, menuItem.cents);
       }
-    });
-
+    }
     const response: PurchaseFromMenuResponse = {
       updatedWalletInCents,
       toUserIds: sentToUserIds,
