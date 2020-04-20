@@ -95,11 +95,11 @@ export default (app: Router) => {
       return res.sendStatus(404);
     }
 
-    const updatedSpotifyConnectedAtSeconds = channelConnectionRepository.updateSpotifyConnection(
+    const updatedSpotifyConnectedAtSeconds: number = await channelConnectionRepository.updateSpotifyConnection(
       channelConnection.channelId,
       channelConnection.connectionId,
       true,
-    )
+    );
     return res.send(updatedSpotifyConnectedAtSeconds);
   });
 
