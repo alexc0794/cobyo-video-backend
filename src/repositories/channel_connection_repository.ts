@@ -90,6 +90,18 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
+  async getSpotifyConnections(channelId: string): Promise<Array<ChannelConnection>> {
+    const channelConnections: Array<ChannelConnection> = await this.getChannelConnections(channelId);
+    const spotifyConnections: Array<ChannelConnection> = channelConnections.filter(
+      channelConnection => channelConnection.spotifyConnectedAtSeconds > 0
+    );
+    const orderedSpotifyConnections: Array<ChannelConnection> = spotifyConnections.sort(
+      (a: ChannelConnection, b: ChannelConnection) => a.spotifyConnectedAtSeconds - b.spotifyConnectedAtSeconds
+    ); // Lowest value first so order of DJ queue is based on who connected first.
+
+    return orderedSpotifyConnections;
+  }
+
   async updateSpotifyConnection(channelId: string, connectionId: string): Promise<number> {
     return new Promise((resolve, reject) =>
       this.awsClient.update({

@@ -83,6 +83,10 @@ export default (app: Router) => {
     });
   });
 
+  type ConnectSpotifyResponse = {
+    userIds: Array<string>,
+  };
+
   app.put('/spotify/connect', authenticate, async function(req: any, res: Response) {
     const channelId = req.body.channelId;
     const userId = req.user.userId
@@ -95,11 +99,14 @@ export default (app: Router) => {
       return res.sendStatus(404);
     }
 
-    const updatedSpotifyConnectedAtSeconds: number = await channelConnectionRepository.updateSpotifyConnection(
+    await channelConnectionRepository.updateSpotifyConnection(
       channelConnection.channelId,
       channelConnection.connectionId,
     );
-    return res.send(updatedSpotifyConnectedAtSeconds);
+    const spotifyConnections: Array<ChannelConnection> = await channelConnectionRepository.getSpotifyConnections(channelId);
+    const userIds = spotifyConnections.map(connection => connection.userId);
+    const response: ConnectSpotifyResponse = { userIds };
+    return res.send(response);
   });
 
 }
