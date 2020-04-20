@@ -6,7 +6,7 @@ import { VideoConnection, TableShape, DEFAULT_VIDEO_CONNECTION, DEFAULT_TABLE_SH
 import { Channel, ChannelConnection, User, Seat, CurrentlyPlaying } from '../interfaces';
 import ChannelRepository from '../repositories/channel_repository';
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
-import CurrentlyPlayingRepository from '../repositories/currently_playing_repository';
+import CurrentlyPlayingRepository from '../repositories/music/currently_playing_repository';
 import UserRepository from '../repositories/users/user_repository';
 import ActiveUserRepository from '../repositories/users/active_user_repository';
 
@@ -185,6 +185,13 @@ export default (app: Router) => {
     } catch {
       return res.sendStatus(404);
     }
+  });
+
+  app.get('/channel/:channelId/spotify-connected', async function(req: Request, res: Response) {
+    const channelId = req.params.channelId;
+    const channelConnections: Array<ChannelConnection> = await (new ChannelConnectionRepository()).getChannelConnections(channelId);
+    const spotifyConnectedAtSeconds: Array<number | null> = channelConnections.map(connection => connection.spotifyConnectedAtSeconds);
+    return res.send(spotifyConnectedAtSeconds);
   });
 
 }

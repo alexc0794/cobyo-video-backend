@@ -17,6 +17,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
       channelId,
       connectionId,
       userId,
+      spotifyConnectedAtSeconds: null,
       connectedAt: (new Date()).toISOString(),
     };
     return new Promise((resolve, reject) =>
@@ -51,7 +52,7 @@ export default class ChannelConnectionRepository extends BaseRepository {
     );
   }
 
-  async getChannelByConnectionId(connectionId: string): Promise<ChannelConnection|null> {
+  async getChannelByConnectionId(connectionId: string): Promise<ChannelConnection | null> {
     return new Promise((resolve, reject) =>
       this.awsClient.query({
         TableName: this.tableName,
@@ -85,6 +86,30 @@ export default class ChannelConnectionRepository extends BaseRepository {
           return resolve([]);
         }
         return resolve(data.Items);
+      })
+    );
+  }
+
+  async updateSpotifyConnection(channelId: string, connectionId: string, connected: boolean): Promise<number> {
+    const spotifyConnectedAtSeconds = connected ? Math.round(Date.now() / 1000) : null;
+    return new Promise((resolve, reject) =>
+      this.awsClient.update({
+        TableName: this.tableName,
+        Key: { channelId, connectionId },
+        UpdateExpression: 'SET spotifyConnectedAtSeconds = :spotifyConnectedAtSeconds',
+        ExpressionAttributeValues: {
+          ':spotifyConnectedAtSeconds': spotifyConnectedAtSeconds,
+        },
+        ReturnValues: 'UPDATED_NEW',
+      }, (err, data) => {
+        if (err) {
+          console.error('Failed to update Spotify connection', channelId, connectionId, connected, err);
+          return reject();
+        }
+        if ('spotifyConnectedAtSeconds' in data.Attributes) {
+          return resolve(data.Attributes['spotifyConnectedAtSeconds']);
+        }
+        return reject();
       })
     );
   }

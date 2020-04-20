@@ -2,7 +2,7 @@ import uuid4 from 'uuid4';
 import { ChannelConnection, ChatMessage, CurrentlyPlaying } from '../interfaces';
 import ChannelConnectionRepository from '../repositories/channel_connection_repository';
 import MenuRepository from '../repositories/menu_repository';
-import CurrentlyPlayingRepository from '../repositories/currently_playing_repository';
+import CurrentlyPlayingRepository from '../repositories/music/currently_playing_repository';
 import ApiGatewayService from '../services/api_gateway_service';
 import { broadcastToChannel } from './channel_helpers';
 

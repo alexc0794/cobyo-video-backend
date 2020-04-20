@@ -1,5 +1,5 @@
-import { SpotifyToken } from '../interfaces/music';
-import BaseRepository from './base_repository';
+import { SpotifyToken } from '../../interfaces/music';
+import BaseRepository from '../base_repository';
 
 export default class SpotifyTokenRepository extends BaseRepository {
 
@@ -38,7 +38,7 @@ export default class SpotifyTokenRepository extends BaseRepository {
           user_id: userId,
           accessToken,
           refreshToken,
-          lastRefreshedAt: (new Date()).toString(),
+          lastRefreshedAt: (new Date()).toISOString(),
           expiringAtSeconds: secondsSinceEpoch + SECONDS_IN_AN_HOUR // Expire a token after an hour
         }
       }, (err, data) => {

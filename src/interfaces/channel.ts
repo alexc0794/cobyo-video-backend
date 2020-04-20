@@ -10,6 +10,7 @@ export interface ChannelConnection {
   channelId: string,
   connectionId: string,
   userId: string,
+  spotifyConnectedAtSeconds: number | null,
   connectedAt: string,
 };
 
@@ -19,5 +20,5 @@ export interface Channel {
   lastUpdatedAt: string,
   videoConnection: VideoConnection,
   tableShape: TableShape,
-  seats: Array<Seat|null>,
+  seats: Array<Seat | null>,
 };

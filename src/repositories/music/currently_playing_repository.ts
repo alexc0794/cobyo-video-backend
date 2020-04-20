@@ -1,5 +1,5 @@
-import { CurrentlyPlaying } from '../interfaces';
-import BaseRepository from './base_repository';
+import { CurrentlyPlaying } from '../../interfaces';
+import BaseRepository from '../base_repository';
 
 export default class ChatMessageRepository extends BaseRepository {
 
@@ -38,6 +38,5 @@ export default class ChatMessageRepository extends BaseRepository {
       })
     );
   }
-
 
 }

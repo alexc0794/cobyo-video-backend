@@ -1,10 +1,12 @@
-import { Router, Request } from 'express';
+import { Router, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import querystring from 'querystring';
 import request from 'request';
-import { authenticate, softAuthenticate } from './middleware';
-import { IS_DEV, COBYO_VIDEO_BASE_API, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../../config';
-import SpotifyTokenRepository from '../repositories/spotify_token_repository';
+import { authenticate, softAuthenticate } from '../middleware';
+import { IS_DEV, COBYO_VIDEO_BASE_API, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../../../config';
+import { ChannelConnection } from '../../interfaces/channel';
+import SpotifyTokenRepository from '../../repositories/music/spotify_token_repository';
+import ChannelConnectionRepository from '../../repositories/channel_connection_repository';
 
 function getBaseUrl(req: Request): string {
   return IS_DEV ? `${req.protocol}://${req.get('host')}` : `${COBYO_VIDEO_BASE_API}`;
@@ -79,6 +81,26 @@ export default (app: Router) => {
         res.status(500).send('❌There was an unexpected issue and Spotify was not successfully authorized. You may now close the tab.');
       }
     });
+  });
+
+  app.put('/spotify/connect', authenticate, async function(req: any, res: Response) {
+    const channelId = req.body.channelId;
+    const userId = req.user.userId
+    const channelConnectionRepository = new ChannelConnectionRepository();
+    const channelConnections: Array<ChannelConnection> = await channelConnectionRepository.getChannelConnections(channelId);
+    const channelConnection: ChannelConnection | undefined = channelConnections.find(
+      channelConnection => channelConnection.userId === userId
+    );
+    if (!channelConnection) {
+      return res.sendStatus(404);
+    }
+
+    const updatedSpotifyConnectedAtSeconds = channelConnectionRepository.updateSpotifyConnection(
+      channelConnection.channelId,
+      channelConnection.connectionId,
+      true,
+    )
+    return res.send(updatedSpotifyConnectedAtSeconds);
   });
 
 }

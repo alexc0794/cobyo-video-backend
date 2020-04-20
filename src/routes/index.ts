@@ -7,7 +7,7 @@ import activeUser from './users/active_user';
 import user from './users/user';
 import userInventory from './users/user_inventory';
 import menu from './storefront/menu';
-import spotify from './spotify';
+import spotify from './music/spotify';
 import storefront from './storefront/storefront';
 import transcript from './transcript';
 
