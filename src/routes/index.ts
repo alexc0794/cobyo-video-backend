@@ -4,6 +4,7 @@ import { AGORA_APP_ID, AGORA_APP_CERTIFICATE } from '../../config';
 import channel from './channel';
 import chat from './chat';
 import activeUser from './users/active_user';
+import dj from './music/dj';
 import user from './users/user';
 import userInventory from './users/user_inventory';
 import menu from './storefront/menu';
@@ -34,6 +35,7 @@ export default (app: express.Application) => {
   activeUser(router);
   channel(router);
   chat(router);
+  dj(router);
   menu(router);
   spotify(router);
   storefront(router);

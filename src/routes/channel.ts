@@ -190,8 +190,10 @@ export default (app: Router) => {
   app.get('/channel/:channelId/spotify-connected', async function(req: Request, res: Response) {
     const channelId = req.params.channelId;
     const channelConnections: Array<ChannelConnection> = await (new ChannelConnectionRepository()).getChannelConnections(channelId);
-    const spotifyConnectedAtSeconds: Array<number | null> = channelConnections.map(connection => connection.spotifyConnectedAtSeconds);
-    return res.send(spotifyConnectedAtSeconds);
+    const spotifyConnections: Array<ChannelConnection> = channelConnections.filter(
+      connection => connection.spotifyConnectedAtSeconds > 0
+    );
+    return res.send(spotifyConnections);
   });
 
 }

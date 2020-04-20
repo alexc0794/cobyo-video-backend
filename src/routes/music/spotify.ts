@@ -98,7 +98,6 @@ export default (app: Router) => {
     const updatedSpotifyConnectedAtSeconds: number = await channelConnectionRepository.updateSpotifyConnection(
       channelConnection.channelId,
       channelConnection.connectionId,
-      true,
     );
     return res.send(updatedSpotifyConnectedAtSeconds);
   });

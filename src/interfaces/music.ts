@@ -17,3 +17,7 @@ export interface CurrentlyPlaying {
   paused: boolean,
   updatedAtMs: number,
 };
+
+export interface DJ {
+
+};

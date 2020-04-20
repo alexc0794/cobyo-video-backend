@@ -10,7 +10,7 @@ export interface ChannelConnection {
   channelId: string,
   connectionId: string,
   userId: string,
-  spotifyConnectedAtSeconds: number | null,
+  spotifyConnectedAtSeconds: number,
   connectedAt: string,
 };
 
